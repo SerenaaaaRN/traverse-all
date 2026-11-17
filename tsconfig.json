@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" },
+  ],
+  "extends": ["./.router/tsconfig.json"],
+  "compilerOptions": {
+    "paths": {
+      "your-path": ["./src/your-path"],
+      "sv-router/generated": ["./.router/generated"],
+    },
+  },
+}

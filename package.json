@@ -1,0 +1,28 @@
+{
+  "name": "traverse-all",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --bun vite dev",
+    "build": "bun --bun vite build",
+    "preview": "bun --bun vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "gen-routes": "sv-router",
+    "postinstall": "sv-router"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@tsconfig/svelte": "^5.0.8",
+    "@types/node": "^24.19.2",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.7.7",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.6"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.5",
+    "sv-router": "^0.19.0",
+    "tailwindcss": "^4.3.5"
+  }
+}
