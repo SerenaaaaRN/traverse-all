@@ -12,6 +12,7 @@ export default defineConfig({
       "@algorithms": path.resolve(__dirname, "./src/algorithms"),
       "@data": path.resolve(__dirname, "./src/data"),
       "@ui": path.resolve(__dirname, "./src/ui"),
+      "@lib": path.resolve(__dirname, "./src/lib"),
     },
   },
 });
