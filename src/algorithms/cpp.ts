@@ -1,3 +1,9 @@
+/**
+ * Pipeline lengkap Chinese Postman Problem.
+ * Struktur mengikuti NetworkX eulerize (paper Edmonds & Johnson 1973):
+ * cek precondition → hitung odd nodes → matching → duplikasi edge di
+ * sepanjang path Dijkstra → Hierholzer untuk rute akhir.
+ */
 import type {
 	CPPResult,
 	MatchingStrategyResult,
@@ -8,6 +14,7 @@ import { calculateDegrees } from "./degrees";
 import { buildDistanceMatrix } from "./dijkstra";
 import { findBruteForceMatching, findGreedyMatching } from "./matching";
 import { hierholzer } from "./euler";
+import { isConnected } from "./connectivity";
 
 function pickStrategy(
 	strategies: MatchingStrategyResult[],
@@ -23,10 +30,55 @@ function pickStrategy(
 	);
 }
 
+function augmentedEdgesAlongPath(
+	graph: TransitGraph,
+	path: string[],
+): { edges: AugmentedEdge[]; pairs: Array<{ source: string; target: string }>; cost: number } {
+	const edges: AugmentedEdge[] = [];
+	const pairs: Array<{ source: string; target: string }> = [];
+	let cost = 0;
+
+	for (let i = 0; i < path.length - 1; i++) {
+		const from = path[i];
+		const to = path[i + 1];
+		if (from === undefined || to === undefined) continue;
+		const weight =
+			graph.edges.find(
+				(e) =>
+					(e.source === from && e.target === to) ||
+					(e.source === to && e.target === from),
+			)?.weightKm ?? 0;
+		edges.push({
+			source: from,
+			target: to,
+			weightKm: weight,
+			augmented: true,
+			routeId: "AUGMENTED",
+		});
+		pairs.push({ source: from, target: to });
+		cost += weight;
+	}
+
+	return { edges, pairs, cost };
+}
+
+/**
+ * Menyelesaikan CPP pada graf undirected. Melempar Error untuk graf
+ * kosong atau disconnected — precondition yang sama dengan NetworkX.
+ */
 export function solveCPP(
 	graph: TransitGraph,
 	strategy: "auto" | "greedy" = "auto",
 ): CPPResult {
+	if (graph.nodes.length === 0) {
+		throw new Error("Graf kosong: tidak ada simpul untuk dianalisis.");
+	}
+	if (!isConnected(graph)) {
+		throw new Error(
+			"Graf tidak connected: CPP membutuhkan seluruh ruas saling terjangkau.",
+		);
+	}
+
 	const degrees = calculateDegrees(graph);
 	const oddNodes = Array.from(degrees.values())
 		.filter((d) => d.isOdd)
@@ -94,45 +146,23 @@ export function solveCPP(
 	}
 
 	const augmentedEdges: AugmentedEdge[] = [];
-	const augmentedEdgeList: Array<{ source: string; target: string }> = [];
+	const augmentedPairs: Array<{ source: string; target: string }> = [];
 	let augmentationCost = 0;
 
 	for (const pair of chosen.pairs) {
 		const path = chosen.paths.get(
 			pair.u < pair.v ? `${pair.u}|${pair.v}` : `${pair.v}|${pair.u}`,
 		);
-		const dijkstraPath =
-			path ??
-			(Array.from(matrix.get(pair.u)?.keys() ?? []).includes(pair.v)
-				? matrix.get(pair.u)?.get(pair.v)?.path
-				: undefined);
-		if (!dijkstraPath || dijkstraPath.length < 2) continue;
-
-		for (let i = 0; i < dijkstraPath.length - 1; i++) {
-			const from = dijkstraPath[i];
-			const to = dijkstraPath[i + 1];
-			if (from === undefined || to === undefined) continue;
-			const weight =
-				graph.edges.find(
-					(e) =>
-						(e.source === from && e.target === to) ||
-						(e.source === to && e.target === from),
-				)?.weightKm ?? 0;
-			augmentedEdges.push({
-				source: from,
-				target: to,
-				weightKm: weight,
-				augmented: true,
-				routeId: "AUGMENTED",
-			});
-			augmentedEdgeList.push({ source: from, target: to });
-			augmentationCost += weight;
-		}
+		if (!path) continue;
+		const alongPath = augmentedEdgesAlongPath(graph, path);
+		augmentedEdges.push(...alongPath.edges);
+		augmentedPairs.push(...alongPath.pairs);
+		augmentationCost += alongPath.cost;
 	}
 
 	const finalCircuit = hierholzer(
 		graph.nodes.map((n) => n.id),
-		[...graph.edges, ...augmentedEdgeList],
+		[...graph.edges, ...augmentedPairs],
 		oddNodes[0] ?? graph.nodes[0]?.id ?? "",
 	);
 

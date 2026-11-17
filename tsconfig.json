@@ -7,8 +7,11 @@
   "extends": ["./.router/tsconfig.json"],
   "compilerOptions": {
     "paths": {
-      "your-path": ["./src/your-path"],
-      "sv-router/generated": ["./.router/generated"],
+      "@algorithms/*": ["./src/algorithms/*"],
+      "@data/*": ["./src/data/*"],
+      "@ui/*": ["./src/ui/*"],
+      "@lib/*": ["./src/lib/*"],
+      "sv-router/generated": ["./.router/router.ts"],
     },
   },
 }
