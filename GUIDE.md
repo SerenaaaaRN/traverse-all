@@ -11,10 +11,15 @@
 | Aspek | Keputusan | Konsekuensi |
 |---|---|---|
 | **Scope graf** | FULL NETWORK — LRT Sumatera Selatan + BRT Transmusi koridor 1–4 + Feeder ME (semua) + Kertoapati | Ratusan node/edge. Entry data = fase terberat. Filter koridor wajib di UI. |
-| **Visualisasi peta** | Leaflet + `imageOverlay` webp + `CRS.Simple` (koordinat pixel) | `TransitNode.x/y` = pixel, konsisten dengan peta sumber |
+| **Visualisasi** | **Cytoscape.js pada canvas bersih** (TANPA peta webp sebagai background). Peta webp hanya referensi/kertas kerja di `/data-entry` | Graf tampil sebagai diagram analisis diskrit yang clean; koordinat node = pixel hasil entry |
+| **Koordinat** | Hybrid: `x/y` pixel (wajib) + `lat/lng` asli (opsional, diisi manual by code untuk presisi/validasi silang) | Entry cepat tetap jalan; lat/lng dipakai untuk cross-check bobot km (haversine) dan persiapan OSM |
+| **Data** | Dataset ditulis **by code** di `src/data/transmusi.json` (sumber kebenaran). Tool `/data-entry` hanyalah helper developer (opsional) | Tidak ada backend/user input; aplikasi murni client-side analisis |
+| **Data** | Dataset ditulis **by code** di `src/data/transmusi.json` (sumber kebenaran). Tool `/data-entry` hanyalah helper developer (opsional) | Tidak ada backend/user input; aplikasi murni client-side analisis |
 | **Arah edge** | Undirected approximation. `isOneWay` tetap dicatat di data untuk visualisasi/disclaimer, tapi diabaikan dalam perhitungan derajat & CPP | Simpler & valid akademik dengan disclaimer tertulis |
 | **Matching** | Brute force untuk ≤ 10 odd nodes, Greedy Nearest Neighbor untuk > 10. **Keduanya dijalankan & dibandingkan** di UI | Nilai akademik plus: perbandingan optimality gap |
-| **Router** | `sv-router` (paket npm resmi, plugin `router()`, layout pakai snippet `children`, navigasi via `p()` dari `sv-router/generated`) | ⚠️ Guide v1 memakai API fiktif (`svRoutes()`, `+page.svelte`) — sudah dikoreksi |
+| **Router** | `sv-router` (paket npm resmi, plugin `router()` dari `sv-router/vite-plugin`, layout pakai snippet `children`, navigasi via `p()` dari `sv-router/generated`) | ⚠️ Guide v1 memakai API fiktif (`svRoutes()`, `+page.svelte`) — sudah dikoreksi |
+| **Testing** | `bun test` + known-answer tests di `tests/` (50 test) | Algoritma pure functions tanpa class — pola yang sama dengan NetworkX; state OOP di `graphState.svelte.ts` |
+| **UI** | Skill design-taste-frontend (bagian yang berlaku untuk tool UI): contrast WCAG AA, satu aksen (blue), semantic color (red=calibrate, amber=draft), `active:scale-[0.98]`, `h-[100dvh]`, label di atas input, empty states, z-index skala terdokumentasi | Skill eksplisit out-of-scope untuk dashboard/product UI → hanya rules umum yang dipakai |
 
 ---
 
@@ -38,15 +43,15 @@ Peta webp ──(klik & ukur di Data Entry Mode)──> transmusi.json (graf typ
 
 **Urutan pengerjaan yang disarankan (timeline kasar):**
 
-1. FASE 0 — Setup (0.5 hari)
-2. FASE 1 — Tipe data (0.5 hari)
-3. **FASE 2 — Data entry tool + entry data full network (3–5 hari)** ⬅️ terberat, mulai SEKARANG setelah setup
-4. FASE 3 — Algoritma (2–3 hari, bisa paralel dengan entry data)
-5. FASE 5 — Visualisasi (2–3 hari)
-6. FASE 4 — Routing & state (0.5 hari, trivial dengan sv-router)
-7. FASE 5b — Fitur tambahan (1–2 hari, bisa bertahap sesuai sisa waktu)
-8. FASE 6 — Testing & validasi (1–2 hari)
-9. FASE 7 — Polish presentasi
+1. FASE 0 — Setup (0.5 hari) ✅ **SELESAI** (leaf, cytoscape, sv-router `router()` dari `sv-router/vite-plugin`, tsconfig strict + resolveJsonModule)
+2. FASE 1 — Tipe data (0.5 hari) ✅ **SELESAI** (`types.ts` + `routes.ts` 13 koridor: LRT-1, TM-1..4, ME-1..7, KR-1..2)
+3. FASE 2 — Data entry tool + entry data full network (3–5 hari) 🔄 **TOOL SELESAI, entry data berjalan**
+4. FASE 3 — Algoritma (2–3 hari) ✅ **SELESAI** (referensi cp-algorithms & NetworkX; Hierholzer O(M); guard connectivity; self-loop degree fix)
+5. FASE 5 — Visualisasi (2–3 hari) ⬜ berikutnya
+6. FASE 4 — Routing & state (0.5 hari) 🟡 **layout.svelte + nav selesai**, halaman placeholder dibuat
+7. FASE 5b — Fitur tambahan (1–2 hari) ⬜
+8. FASE 6 — Testing & validasi (1–2 hari) ✅ **SELESAI** (50/50 pass, `bun test`; algoritma stateless pure functions — pola NetworkX)
+9. FASE 7 — Polish presentasi ⬜
 
 ---
 
@@ -117,42 +122,40 @@ export default defineConfig({
 ```text
 transmusi-euler/
 ├── public/
-│   └── transportasi_palembang.webp
+│   └── transportasi_palembang.webp      # referensi entry (TIDAK dipakai di visualisasi)
 ├── src/
 │   ├── algorithms/             # Pure Math Logic (no side effects)
 │   │   ├── types.ts            # Base interfaces (kontrak tunggal)
 │   │   ├── degrees.ts          # Hitung derajat simpul
-│   │   ├── euler.ts            # Euler check + Hierholzer circuit
+│   │   ├── euler.ts            # Hierholzer O(M)
 │   │   ├── dijkstra.ts         # Shortest path
 │   │   ├── matching.ts         # Brute force + greedy matching
+│   │   ├── connectivity.ts     # isConnected (BFS, konvensi NetworkX)
 │   │   └── cpp.ts              # Pipeline CPP lengkap
 │   ├── data/
-│   │   ├── transmusi.json      # Dataset full network (dihasilkan Data Entry Mode)
+│   │   ├── transmusi.json      # ⭐ Dataset by code (sumber kebenaran)
+│   │   ├── index.ts            # validateGraph() runtime guard
 │   │   └── routes.ts           # Metadata koridor (id, warna, mode, nama)
 │   ├── components/
-│   │   ├── ui/                 # SHADCN PRIMITIVES (zero domain logic)
-│   │   └── domain/             # Transmusi/Euler/CPP specific
-│   │       ├── MapView.svelte          # Leaflet + imageOverlay + graf overlay
-│   │       ├── DegreeTable.svelte      # Tabel derajat + highlighting odd/even
+│   │   └── domain/
+│   │       ├── GraphView.svelte        # ⭐ Cytoscape canvas bersih (visualisasi utama)
+│   │       ├── DegreeTable.svelte
 │   │       ├── CPPStepVisualizer.svelte
-│   │       ├── RouteAnimator.svelte    # + slider kecepatan & step manual
+│   │       ├── RouteAnimator.svelte
 │   │       ├── EdgeWeightLegend.svelte
-│   │       ├── CorridorFilter.svelte   # Toggle LRT / koridor / feeder
-│   │       ├── NetworkStats.svelte     # Dashboard statistik jaringan
-│   │       ├── TheoryInteractive.svelte # Mini-graf klikable di halaman teori
-│   │       └── HalteSearch.svelte      # Search halte → zoom peta
-│   ├── routes/                 # SV-ROUTER (file-based)
-│   │   ├── layout.svelte       # Root layout: nav + PERSISTENT STATE
-│   │   ├── index.svelte        # Peta + graf utama
-│   │   ├── theory.svelte       # Halaman teori Euler & CPP
-│   │   ├── analysis.svelte     # Analisis derajat, odd nodes, CPP result
-│   │   ├── comparison.svelte   # Perbandingan brute vs greedy + baseline
-│   │   └── data-entry.svelte   # ⭐ Tool entry data (klik node, drag edge)
+│   │       ├── CorridorFilter.svelte
+│   │       ├── NetworkStats.svelte
+│   │       ├── TheoryInteractive.svelte
+│   │       └── HalteSearch.svelte
+│   ├── routes/
+│   │   ├── layout.svelte       # ✅ Root layout: nav persist
+│   │   ├── index.svelte        # Peta graf (Cytoscape)
+│   │   ├── theory.svelte
+│   │   ├── analysis.svelte
+│   │   ├── comparison.svelte
+│   │   └── data-entry.svelte   # Helper developer (Leaflet + webp, opsional)
 │   ├── lib/
-│   │   ├── graphState.svelte.ts  # Global state ($state rune module)
-│   │   └── leafletImage.ts       # Kalibrasi skala & konversi pixel-km
-│   ├── utils/
-│   │   └── formatters.ts
+│   │   └── graphState.svelte.ts  # ✅ Global state (module rune)
 │   └── main.ts
 ├── index.html
 ├── vite.config.ts
@@ -186,6 +189,8 @@ export interface TransitNode {
   label: string;       // nama halte asli di peta
   x: number;           // pixel X pada transportasi_palembang.webp
   y: number;           // pixel Y pada transportasi_palembang.webp
+  lat?: number | null; // latitude asli, diisi manual by code (opsional)
+  lng?: number | null; // longitude asli, diisi manual by code (opsional)
   type: "station" | "stop" | "terminal" | "transfer";
   routeIds: string[];  // koridor yang melayani halte ini (untuk filter)
 }
@@ -257,18 +262,17 @@ Contoh: LRT_BANDARA, K1_ALANG_ALANG_LEBAR, ME3_PUNTI_KAYU
 Transfer node (halte dilayani ≥2 koridor): gunakan satu node bersama, bukan duplikat.
 ```
 
-### 2.3 Spesifikasi Data Entry Mode (route `/data-entry`)
+### 2.3 Data Entry (by code di `src/data/transmusi.json`)
 
-Fitur minimum tool:
+Dataset ditulis langsung sebagai JSON by code. Tool `/data-entry` tersedia sebagai **helper developer** (opsional) kalau merasa perlu klik-visual; aplikasi tidak bergantung padanya — sumber kebenaran tetap file JSON.
 
-- [ ] Load `transportasi_palembang.webp` full-res di Leaflet (`CRS.Simple`, `imageOverlay`)
-- [ ] Mode "Add Node": klik peta → form mini (label, type, koridor) → node muncul sebagai marker
-- [ ] Mode "Add Edge": klik node A → klik node B → dialog input `isOneWay` → weightKm dihitung otomatis dari kalibrasi
-- [ ] Mode "Calibrate": klik 2 titik, input jarak km asli → set `kmPerPixel`
-- [ ] List panel: semua node & edge yang sudah dibuat, bisa edit/delete
-- [ ] **Export JSON** (download `transmusi.json`) dan **Import JSON** (untuk melanjutkan sesi lainnya)
-- [ ] Auto-save ke `localStorage` tiap perubahan (antisipasi tab close)
-- [ ] Validasi: node dengan degree 0, edge duplikat, edge menghubungkan node tak dikenal
+Checklist konsistensi data:
+
+- [ ] Setiap node: id unik, label sesuai nama asli peta, koordinat x/y pixel, routeIds
+- [ ] lat/lng asli diisi manual (opsional) untuk halte yang koordinatnya diketahui — dipakai cross-check bobot km (haversine vs kalibrasi)
+- [ ] Setiap edge: weightKm dari kalibrasi pixel→km, routeId valid
+- [ ] Node transfer (dilayani ≥2 koridor) dibuat satu kali, bukan duplikat
+- [ ] `validateGraph()` di `@data/index.ts` selalu lolos setiap commit
 
 ### 2.4 Format Penyimpanan
 
@@ -458,55 +462,57 @@ export const graphState = new GraphState();
 
 ---
 
-## FASE 5: Visualisasi Leaflet
+## FASE 5: Visualisasi Graf dengan Cytoscape.js (Canvas Bersih)
 
-### 5.1 MapView (`src/components/domain/MapView.svelte`)
+> **Keputusan locked:** visualisasi TIDAK memakai peta webp sebagai background. Peta webp hanya referensi saat entry. Visualisasi = diagram graf yang clean di canvas kosong. Leaflet hanya dipakai di `/data-entry`; visualisasi memakai Cytoscape.js (sudah terinstall).
+
+### 5.1 GraphView (`src/components/domain/GraphView.svelte`)
 
 ```svelte
 <script lang="ts">
-  import { onMount } from "svelte";
-  import L from "leaflet";
-  import "leaflet/dist/leaflet.css";
+  import { onMount, onDestroy } from "svelte";
+  import cytoscape from "cytoscape";
   import { graphState } from "@lib/graphState.svelte";
+  import { routeById } from "@data/routes";
 
-  const IMG_W = 1456; // sesuaikan dimensi asli webp
-  const IMG_H = 2054;
-
-  let map: L.Map | null = null;
-  let mapEl: HTMLDivElement;
-  let overlayLayer: L.LayerGroup | null = null;
+  let cy: cytoscape.Core | null = null;
+  let container: HTMLDivElement;
 
   onMount(() => {
-    map = L.map(mapEl, {
-      crs: L.CRS.Simple,
-      minZoom: -1,
-      maxZoom: 2,
+    cy = cytoscape({
+      container,
+      layout: { name: "preset", fit: true },
+      style: buildCytoscapeStyle(),       // lihat 5.2
+      elements: buildElements(graphState.activeGraph), // node + edge dari data
     });
-    const bounds: L.LatLngBoundsExpression = [[0, 0], [IMG_H, IMG_W]];
-    L.imageOverlay("transportasi_palembang.webp", bounds).addTo(map);
-    map.fitBounds(bounds);
-    renderOverlay();
   });
 
-  function renderOverlay() { /* polylines + markers dari graphState.activeGraph */ }
+  onDestroy(() => cy?.destroy());
 </script>
 
-<div bind:this={mapEl} style="height: 80vh; background: #fdfdfd;"></div>
+<div bind:this={container} class="h-[100dvh] w-full bg-white"></div>
 ```
 
-### 5.2 Aturan Render
+Posisi node: layout `preset` dengan `position: { x: node.x, y: node.y }` — bentuk topologi tetap sama seperti peta sumber, minus background.
+
+### 5.2 Aturan Render (Cytoscape style)
 
 | Elemen | Style |
 |---|---|
-| Edge koridor aktif | Polyline warna koridor (`RouteLine.color`), weight 4 |
-| Edge dim/terfilter | Polyline abu-abu tipis (konteks tetap terlihat) |
-| Odd node | CircleMarker merah, radius 7 |
-| Even node | CircleMarker biru radius 5 |
-| **Augmented edge** | Polyline **dashed red** (`dashArray: "8 6"`), weight 3 |
-| Rute akhir (eulerCircuit) | Animasi polyline (RouteAnimator), marker postman bergerak |
-| One-way | Chevron/arrowhead dekoratif di polyline |
+| Edge koridor aktif | Line color per koridor (`routeById.get(routeId).color`), width 4 |
+| Edge koridor terfilter | Abu-abu tipis, opacity rendah (konteks tetap terlihat) |
+| Node biasa (even) | Circle, background biru (`#60a5fa`), radius 5 |
+| Odd node | Circle merah, radius 8 — highlight otomatis dari `calculateDegrees` |
+| Node terminal/stasiun | Bentuk `round-rectangle`, label bold |
+| **Augmented edge** | Line style **dashed**, color merah, width 3 |
+| Label | Node label di bawah node, font kecil |
+| One-way (info) | `target-arrow-shape: triangle`, dekoratif |
 
-`LATLNG HELPER`: node pixel `(x, y)` → Leaflet `latLng(IMG_H - y, x)` (ingat sumbu Y Leaflet CRS.Simple terbalik).
+Interaksi: `cy.on("tap", "node", ...)` → tooltip/popup derajat + koridor; `cy.on("tap", "edge", ...)` → detail bobot.
+
+### 5.3 Animasi Rute Akhir (postman tour)
+
+Rute `eulerCircuit` dianimasikan dengan highlight edge berurutan via `cy.animate` + class pada edge, dikontrol `RouteAnimator` (play/pause/step, 5b.3). Edge augmentasi diberi class berbeda agar berwarna merah saat dilalui.
 
 ---
 
@@ -584,7 +590,7 @@ Framework: `bun test` (built-in) — algoritma pure TS jadi trivially testable t
 
 | Risiko | Mitigasi |
 |---|---|
-| Entry data full network melelahkan & mentok di tengah | Data Entry Mode + entry per koridor + commit per koridor (FASE 2.5) |
+| Entry data full network melelahkan & mentok di tengah | Entry by code per koridor + commit per koridor (`data: add koridor X`); tool `/data-entry` tersedia sebagai helper klik-visual kalau perlu |
 | Peta webp bukan geografis presisi → jarak km kurang akurat | Kalibrasi + verifikasi silang 2–3 pasangan titik + disclaimer ±10% |
 | Brute force freeze browser (>10 odd) | Guard otomatis + comparison page menunjukkan gap greedy |
 | sv-router API beda dari asumsi | Sudah diverifikasi dari sv-router.dev (layout children, `p()`, plugin `router()`) |

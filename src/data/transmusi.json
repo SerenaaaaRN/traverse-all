@@ -1,0 +1,32 @@
+{
+	"nodes": [
+		{ "id": "LRT_BANDARA", "label": "Bandara SMB II", "x": 452, "y": 268, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_PUNCI", "label": "Sp. Puncang", "x": 530, "y": 305, "lat": null, "lng": null, "type": "stop", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_PERUMNAS", "label": "Perumnas Mutiara", "x": 470, "y": 368, "lat": null, "lng": null, "type": "stop", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_ASRAMA", "label": "Asrama Haji", "x": 385, "y": 420, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_PUNTI_KAYU", "label": "Punti Kayu", "x": 400, "y": 660, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_RSUD", "label": "RSUD", "x": 468, "y": 815, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_DEMANG", "label": "Demang", "x": 600, "y": 962, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_BUMI_SRIWIJAYA", "label": "Bumi Sriwijaya", "x": 648, "y": 1078, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_CINDE", "label": "Cinde", "x": 822, "y": 1082, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_AMPERA", "label": "Ampera", "x": 968, "y": 1152, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_POLRESTA", "label": "Polresta", "x": 1062, "y": 1278, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_JAKABARING", "label": "Jakabaring", "x": 1132, "y": 1408, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1"] },
+		{ "id": "LRT_DKO", "label": "DJKA", "x": 1130, "y": 1444, "lat": null, "lng": null, "type": "station", "routeIds": ["LRT-1", "KR-1"] }
+	],
+	"edges": [
+		{ "source": "LRT_BANDARA", "target": "LRT_PUNCI", "weightKm": 1.9, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_PUNCI", "target": "LRT_PERUMNAS", "weightKm": 1.4, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_PERUMNAS", "target": "LRT_ASRAMA", "weightKm": 1.6, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_ASRAMA", "target": "LRT_PUNTI_KAYU", "weightKm": 4.8, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_PUNTI_KAYU", "target": "LRT_RSUD", "weightKm": 3.1, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_RSUD", "target": "LRT_DEMANG", "weightKm": 2.6, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_DEMANG", "target": "LRT_BUMI_SRIWIJAYA", "weightKm": 2.2, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_BUMI_SRIWIJAYA", "target": "LRT_CINDE", "weightKm": 1.7, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_CINDE", "target": "LRT_AMPERA", "weightKm": 2.9, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_AMPERA", "target": "LRT_POLRESTA", "weightKm": 1.9, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_POLRESTA", "target": "LRT_JAKABARING", "weightKm": 1.6, "isOneWay": false, "routeId": "LRT-1" },
+		{ "source": "LRT_JAKABARING", "target": "LRT_DKO", "weightKm": 0.7, "isOneWay": false, "routeId": "LRT-1" }
+	],
+	"kmPerPixel": 0.0125
+}

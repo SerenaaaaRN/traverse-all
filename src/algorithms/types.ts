@@ -12,6 +12,8 @@ export interface TransitNode {
   label: string;
   x: number;
   y: number;
+  lat?: number | null;
+  lng?: number | null;
   type: "station" | "stop" | "terminal" | "transfer";
   routeIds: string[];
 }
