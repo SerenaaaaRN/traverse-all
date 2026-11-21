@@ -1,17 +1,17 @@
 /**
- * State global aplikasi (module rune). Sumber data tunggal adalah
- * src/data/nodes.json — tidak ada filter koridor, seluruh jaringan ditampilkan.
+ * State global aplikasi (module rune). Data statis bertipe berasal dari
+ * src/data/nodes.ts dan src/data/edges.ts — tanpa barrel atau runtime validator.
  */
-import type { PatrolGraph, PatrolNode, PatrolMetadata } from "@algorithms/types";
-import { patrolNetwork } from "@data";
+import type { PatrolGraph, PatrolNode } from "@algorithms/types";
+import { patrolNodes } from "@data/nodes";
+import { patrolEdges } from "@data/edges";
 
 class GraphState {
-  nodes = $state<PatrolNode[]>(patrolNetwork.nodes);
-  edges = $state(patrolNetwork.edges);
-  metadata: PatrolMetadata = patrolNetwork.metadata!;
+  nodes = $state<PatrolNode[]>(patrolNodes);
+  edges = $state(patrolEdges);
 
   graph(): PatrolGraph {
-    return { nodes: this.nodes, edges: this.edges, metadata: this.metadata };
+    return { nodes: this.nodes, edges: this.edges };
   }
 
   nodeById(id: string): PatrolNode | undefined {

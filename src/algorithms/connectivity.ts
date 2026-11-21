@@ -2,7 +2,7 @@ import type { PatrolGraph } from "@algorithms/types";
 
 /**
  * Mengecek apakah bagian non-terisolasi dari graf undirected bersifat
- * connected, mengikuti konvensi NetworkX: node berderajat 0 diabaikan,
+ * connected, node berderajat 0 diabaikan,
  * sisanya harus saling terjangkau. Kompleksitas O(V + M) via BFS.
  */
 export function isConnected(graph: PatrolGraph): boolean {

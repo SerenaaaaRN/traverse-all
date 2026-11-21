@@ -131,7 +131,8 @@ $$
 
 Objek studi kasus adalah jaringan jalan internal Kilang Pertamina Plaju.
 Data diperoleh melalui tracking titik pada Google Maps menggunakan editor peta
-sederhana, kemudian disimpan sebagai `src/data/nodes.json`.
+sederhana, kemudian disimpan sebagai objek TypeScript bertipe di
+`src/data/nodes.ts` dan `src/data/edges.ts`.
 
 Struktur data:
 
@@ -181,8 +182,8 @@ $$
 
 ### 2.4 Algoritma
 
-1. **Konstruksi graf:** membaca `src/data/nodes.json`, membangun objek
-   `PatrolGraph`, dan mengonversi bobot dari meter ke kilometer.
+1. **Konstruksi graf:** membaca `src/data/nodes.ts` dan `src/data/edges.ts`,
+   lalu merakit objek `PatrolGraph` dengan bobot dalam kilometer.
 2. **Audit topologi:** memeriksa konektivitas, `μ`, siklus dasar, bridge, dan
    derajat simpul.
 3. **Identifikasi odd node:** mengelompokkan simpul dengan derajat ganjil.
@@ -375,10 +376,10 @@ src/
 │   ├── euler.ts         # Hierholzer
 │   └── cpp.ts           # pipeline CPP
 ├── data/
-│   ├── nodes.json       # sumber data
-│   └── index.ts         # loader + validator
+│   ├── nodes.ts         # 73 simpul (typed)
+│   └── edges.ts         # 112 ruas (typed)
 ├── lib/graphState.svelte.ts
-├── components/domain/   # GraphView (Leaflet), DegreeTable
+├── components/          # graph-view.svelte (Leaflet), degree-table.svelte
 ├── routes/              # index, analysis, comparison, theory
 └── tests/               # bun test
 ```
@@ -419,17 +420,14 @@ Rute hasil pasangan terdekat menghemat 14,386 km dibanding baseline. Strategi
 ini tidak menjamin biaya minimum mutlak, tetapi mudah dijelaskan dan cukup
 efektif untuk kasus ini.
 
-Pengujian otomatis terdiri dari 9 kelompok test:
+Pengujian otomatis terdiri dari 44 test dalam 5 file:
 
-1. Siklus C4 menghasilkan sirkuit Euler tanpa augmentasi.
-2. Dua simpul ganjil memerlukan augmentasi untuk tour tertutup.
-3. Edge paralel dipertahankan pada representasi graf.
-4. Pasangan terdekat menghasilkan tour valid pada instance known-answer.
-5. Graf terputus menghasilkan `Error`.
-6. Dataset nyata: 73 simpul, 112 sisi, connected, `μ = 40`.
-7. Schema JSON valid, tanpa ID, dan edge unik.
-8. Metrik CPP sesuai laporan.
-9. Loader menolak edge duplikat.
+1. Derajat simpul dan identifikasi simpul ganjil (`degrees.test.ts`).
+2. Dijkstra dan matriks jarak terpendek (`dijkstra.test.ts`).
+3. Hierholzer menghasilkan sirkuit Euler yang valid (`euler.test.ts`).
+4. Pasangan terdekat: known-answer dan path Dijkstra (`matching.test.ts`).
+5. Pipeline CPP: C4, dua simpul ganjil, augmentasi, graf terputus, dan
+   validitas rute (`cpp.test.ts`).
 
 #### 3.5.2 Analisis Kompleksitas
 

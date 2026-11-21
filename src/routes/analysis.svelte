@@ -2,8 +2,8 @@
   import type { CPPResult } from "@algorithms/types";
   import { solveCPP } from "@algorithms/cpp";
   import { graphState } from "@lib/graphState.svelte";
-  import GraphView from "../components/domain/GraphView.svelte";
-  import DegreeTable from "../components/domain/DegreeTable.svelte";
+  import GraphView from "@components/graph-view.svelte";
+  import DegreeTable from "@components/degree-table.svelte";
 
   const graph = $derived(graphState.graph());
 

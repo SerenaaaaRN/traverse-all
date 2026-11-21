@@ -13,19 +13,9 @@ export interface PatrolEdge {
   weightKm: number;
 }
 
-/** Informasi sumber dataset (dari metadata nodes.json). */
-export interface PatrolMetadata {
-  name: string;
-  source: string;
-  weightUnit: string;
-  coordinateNote: string;
-  graphNote: string;
-}
-
 export interface PatrolGraph {
   nodes: PatrolNode[];
   edges: PatrolEdge[];
-  metadata?: PatrolMetadata;
 }
 
 export interface DegreeInfo {

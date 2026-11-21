@@ -13,6 +13,7 @@ export default defineConfig({
       "@data": path.resolve(import.meta.dirname, "./src/data"),
       "@ui": path.resolve(import.meta.dirname, "./src/ui"),
       "@lib": path.resolve(import.meta.dirname, "./src/lib"),
+      "@components": path.resolve(import.meta.dirname, "./src/components"),
     },
   },
 });

@@ -12,9 +12,9 @@
 | Aspek | Keputusan | Alasan |
 |---|---|---|
 | Objek | Jaringan jalan kilang, 73 simpul / 112 ruas | Graf nyata dengan μ = 40, bukan pohon → CPP bermakna |
-| Sumber data | `src/data/nodes.json` | Satu-satunya sumber kebenaran, tanpa backend |
-| Graf | Undirected, satu edge unik per pasangan | Sesuai metadata dataset |
-| Bobot | `distance_m / 1000` → km | Dari geometri titik tracking |
+| Sumber data | `src/data/nodes.ts` + `edges.ts` | Objek TypeScript bertipe, tanpa backend |
+| Graf | Undirected, satu edge unik per pasangan | Sesuai konvensi dataset |
+| Bobot | km (meter ÷ 1000, ditulis eksak) | Dari geometri titik tracking |
 | Koordinat | `lat/lng` asli | Dipakai langsung oleh Leaflet, tanpa proyeksi buatan |
 | Tampilan peta | Leaflet + tile OpenStreetMap | Peta geografis sesuai lokasi sebenarnya |
 | Filter | Tidak ada — seluruh jaringan ditampilkan | Laporan menganalisis graf penuh |
@@ -28,22 +28,23 @@
 | Fase | Status |
 |---|---|
 | Setup (Vite, Svelte 5, sv-router, Tailwind, Leaflet) | ✅ |
-| Tipe data & loader `nodes.json` | ✅ |
+| Tipe data & dataset statis `nodes.ts` / `edges.ts` | ✅ |
 | Algoritma: derajat, Dijkstra, konektivitas, Hierholzer, CPP | ✅ |
 | Peta Leaflet & halaman analisis | ✅ |
 | Halaman perbandingan & teori | ✅ |
 | Laporan `docs/Laporan.md` (diselaraskan ke TypeScript & angka greedy) | ✅ |
-| Testing (`bun test`: 47 test) & typecheck | ✅ |
+| Testing (`bun test`: 44 test) & typecheck | ✅ |
 
 ---
 
 ## 3. Alur data
 
 ```text
-src/data/nodes.json
-   │  (loader + validator: src/data/index.ts)
+src/data/nodes.ts  ── patrolNodes (73)
+src/data/edges.ts  ── patrolEdges (112)
+   │  (dirakit di graphState.svelte.ts)
    ▼
-PatrolGraph { nodes, edges, metadata }
+PatrolGraph { nodes, edges }
    │
    ├── calculateDegrees  → 38 simpul ganjil
    ├── buildDistanceMatrix (Dijkstra)
@@ -52,18 +53,18 @@ PatrolGraph { nodes, edges, metadata }
    └── hierholzer → 147 langkah, 22,904 km
 ```
 
-Konversi schema oleh loader:
+Bentuk data di TypeScript:
 
-| JSON | Internal |
+| Field | Tipe |
 |---|---|
-| `name` | `id` |
-| `from`, `to` | `source`, `target` |
-| `distance_m` | `weightKm` (m ÷ 1000) |
-| `lat`, `lng` | `lat`, `lng` (apa adanya) |
-| `status` | diabaikan |
+| `id`, `label` | `string` |
+| `lat`, `lng` | `number` (koordinat asli) |
+| `source`, `target` | `string` |
+| `weightKm` | `number` (kilometer) |
 
-Validator menolak: node id duplikat, endpoint tidak ada, self-loop, edge
-duplikat, dan jarak non-positif.
+Validasi cukup dari `satisfies PatrolNode[]` / `satisfies PatrolEdge[]` saat
+compile. Tidak ada runtime validator; integritas data bergantung pada konvensi
+dan pengujian algoritma di `tests/*.test.ts`.
 
 ---
 
@@ -81,7 +82,7 @@ duplikat, dan jarak non-positif.
 | Baseline 2× bobot | 37,290 km |
 | Penghematan | 38,58% |
 
-Angka di atas dikunci oleh `tests/dataset.test.ts`.
+Angka di atas tercatat di `docs/Laporan.md` sebagai hasil komputasi CPP.
 
 ---
 
