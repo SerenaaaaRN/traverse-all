@@ -1,14 +1,55 @@
 <script lang="ts">
-  import GraphView from "@components/graph-view.svelte";
   import { graphState } from "@lib/graphState.svelte";
+  import { viewState } from "@lib/viewState.svelte";
+  import { calculateDegrees } from "@algorithms/degrees";
+
+  const degrees = $derived(calculateDegrees(graphState.graph()));
+  const oddCount = $derived([...degrees.values()].filter((d) => d.isOdd).length);
+  const selected = $derived(
+    viewState.selectedNode ? graphState.nodeById(viewState.selectedNode) : undefined,
+  );
 </script>
 
-<div class="relative h-full">
-  <GraphView />
-  <div class="absolute top-3 left-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs shadow">
-    <b>Jaringan Jalan Internal Kilang Pertamina Plaju</b>
-    <p class="text-neutral-500">
-      {graphState.nodes.length} simpul · {graphState.edges.length} ruas
-    </p>
+<h1 class="text-lg font-bold text-neutral-900">Peta Jaringan</h1>
+<p class="mt-1 text-xs leading-relaxed text-neutral-500">
+  Jaringan jalan internal Kilang Pertamina Plaju. Klik simpul di peta untuk memilihnya.
+</p>
+
+<div class="mt-4 grid grid-cols-3 gap-2">
+  <div class="rounded-lg border border-neutral-200 p-2.5">
+    <p class="text-[10px] text-neutral-500">Simpul</p>
+    <p class="text-lg font-semibold text-neutral-800">{graphState.nodes.length}</p>
   </div>
+  <div class="rounded-lg border border-neutral-200 p-2.5">
+    <p class="text-[10px] text-neutral-500">Ruas</p>
+    <p class="text-lg font-semibold text-neutral-800">{graphState.edges.length}</p>
+  </div>
+  <div class="rounded-lg border border-neutral-200 p-2.5">
+    <p class="text-[10px] text-neutral-500">Ganjil</p>
+    <p class="text-lg font-semibold text-red-700">{oddCount}</p>
+  </div>
+</div>
+
+<div class="mt-5 rounded-lg border border-neutral-200 p-3">
+  <h2 class="text-xs font-semibold text-neutral-700">Simpul terpilih</h2>
+  {#if selected}
+    <p class="mt-2 font-mono text-sm font-semibold text-green-700">{selected.id}</p>
+    <p class="mt-1 text-xs text-neutral-500">
+      {selected.label || "Tanpa label"} · {selected.lat.toFixed(6)}, {selected.lng.toFixed(6)}
+    </p>
+    <p class="mt-1 text-xs text-neutral-500">
+      Derajat {degrees.get(selected.id)?.degree ?? 0}
+      {degrees.get(selected.id)?.isOdd ? "(ganjil)" : "(genap)"}
+    </p>
+  {:else}
+    <p class="mt-2 text-xs text-neutral-400">Belum ada simpul dipilih.</p>
+  {/if}
+</div>
+
+<div class="mt-5 rounded-lg bg-neutral-50 p-3 text-xs leading-relaxed text-neutral-600">
+  <p class="font-semibold text-neutral-700">Mulai dari mana?</p>
+  <p class="mt-1">
+    Buka <b>Analisis</b> untuk melihat metrik CPP dan memutar demo lintasan, lalu
+    <b>Rute</b> untuk mencari jalur terpendek antar dua simpul.
+  </p>
 </div>

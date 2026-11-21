@@ -2,24 +2,12 @@
   import { onMount, onDestroy, untrack } from "svelte";
   import * as L from "leaflet";
   import "leaflet/dist/leaflet.css";
-  import type { CPPResult, PatrolNode } from "@algorithms/types";
-  import type { RouteResult } from "@algorithms/route";
+  import type { PatrolNode } from "@algorithms/types";
   import { calculateDegrees } from "@algorithms/degrees";
   import { graphState } from "@lib/graphState.svelte";
+  import { viewState } from "@lib/viewState.svelte";
 
-  let {
-    cpp = null,
-    showTour = true,
-    tourStep = null,
-    route = null,
-    onNodeClick,
-  }: {
-    cpp?: CPPResult | null;
-    showTour?: boolean;
-    tourStep?: number | null;
-    route?: RouteResult | null;
-    onNodeClick?: (id: string) => void;
-  } = $props();
+  let { visible = true }: { visible?: boolean } = $props();
 
   let container: HTMLDivElement | null = null;
   let map: L.Map | null = null;
@@ -30,7 +18,7 @@
   let routeLayer: L.LayerGroup | null = null;
   let byId = new Map<string, PatrolNode>();
   let weightLines: L.Polyline[] = [];
-  let showWeights = $state(false);
+  let fitted = false;
 
   const START = "P74";
 
@@ -45,7 +33,7 @@
 
   function syncWeightLabels(): void {
     for (const line of weightLines) {
-      if (showWeights) line.openTooltip();
+      if (viewState.showWeights) line.openTooltip();
       else line.closeTooltip();
     }
   }
@@ -58,9 +46,10 @@
     if (!tourLayer || !visitedLayer) return;
     tourLayer.clearLayers();
     visitedLayer.clearLayers();
+    const cpp = viewState.cpp;
 
-    if (tourStep === null) {
-      if (showTour && cpp?.eulerCircuit) {
+    if (viewState.tourStep === null) {
+      if (viewState.showTour && cpp?.eulerCircuit) {
         const path = cpp.eulerCircuit
           .map((id) => latlng(id))
           .filter((p): p is L.LatLngExpression => p !== null);
@@ -77,7 +66,7 @@
     if (!cpp?.eulerCircuit) return;
 
     const circuit = cpp.eulerCircuit;
-    const last = Math.min(Math.max(tourStep, 0), circuit.length - 1);
+    const last = Math.min(Math.max(viewState.tourStep, 0), circuit.length - 1);
     const counts = new Map<string, number>();
 
     for (let i = 0; i < last; i++) {
@@ -90,15 +79,16 @@
       const key = pairKey(from, to);
       const repeated = (counts.get(key) ?? 0) > 0;
       counts.set(key, (counts.get(key) ?? 0) + 1);
+      const isLatest = i === last - 1;
       L.polyline([a, b], {
-        color: "#4ade80",
-        weight: 3,
+        color: isLatest ? "#15803d" : "#4ade80",
+        weight: isLatest ? 5 : 3,
         opacity: repeated ? 0.9 : 0.85,
         dashArray: repeated ? "6 6" : undefined,
       }).addTo(tourLayer);
     }
 
-    for (let i = 0; i <= last; i++) {
+    for (let i = 0; i < last; i++) {
       const id = circuit[i];
       if (id === undefined) continue;
       const p = latlng(id);
@@ -110,6 +100,29 @@
         fillColor: "#4ade80",
         fillOpacity: 0.95,
       }).addTo(visitedLayer);
+    }
+
+    const activeId = circuit[last];
+    const activePoint = activeId === undefined ? null : latlng(activeId);
+    if (activeId !== undefined && activePoint) {
+      L.marker(activePoint, {
+        icon: L.divIcon({
+          className: "",
+          html:
+            '<span class="relative flex h-6 w-6 items-center justify-center">' +
+            '<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60"></span>' +
+            '<span class="relative inline-flex h-5 w-5 rounded-full border-2 border-white bg-green-700"></span>' +
+            "</span>",
+          iconSize: [24, 24],
+          iconAnchor: [12, 12],
+        }),
+      })
+        .bindTooltip(`Sekarang: ${activeId} · langkah ${last + 1}`, {
+          permanent: true,
+          direction: "top",
+          offset: [0, -14],
+        })
+        .addTo(visitedLayer);
     }
   }
 
@@ -125,6 +138,7 @@
     const graph = graphState.graph();
     const degrees = calculateDegrees(graph);
     byId = new Map(graph.nodes.map((n) => [n.id, n]));
+    const cpp = viewState.cpp;
 
     for (const edge of graph.edges) {
       const a = latlng(edge.source);
@@ -147,11 +161,12 @@
       const degree = degrees.get(node.id)?.degree ?? 0;
       const isOdd = degrees.get(node.id)?.isOdd ?? false;
       const isStart = node.id === START;
+      const markOdd = isOdd && viewState.showOdd;
       const marker = L.circleMarker([node.lat, node.lng], {
-        radius: isStart ? 8 : isOdd ? 6 : 4.5,
-        color: isStart ? "#14532d" : isOdd ? "#7f1d1d" : "#1e40af",
+        radius: isStart ? 8 : markOdd ? 6 : 4.5,
+        color: isStart ? "#14532d" : markOdd ? "#7f1d1d" : "#1e40af",
         weight: 1.5,
-        fillColor: isStart ? "#16a34a" : isOdd ? "#dc2626" : "#3b82f6",
+        fillColor: isStart ? "#16a34a" : markOdd ? "#dc2626" : "#3b82f6",
         fillOpacity: 1,
       });
       marker.bindPopup(
@@ -160,11 +175,11 @@
           `Lat: ${node.lat.toFixed(6)}, Lng: ${node.lng.toFixed(6)}`,
       );
       marker.bindTooltip(node.id, { permanent: true, direction: "top" });
-      marker.on("click", () => onNodeClick?.(node.id));
+      marker.on("click", () => viewState.onNodeClick(node.id));
       marker.addTo(networkLayer!);
     }
 
-    if (cpp) {
+    if (cpp && viewState.showTour) {
       for (const edge of cpp.augmentedEdges) {
         const a = latlng(edge.source);
         const b = latlng(edge.target);
@@ -176,11 +191,10 @@
           dashArray: "6 6",
         }).addTo(augmentLayer!);
       }
-
     }
 
-    if (route) {
-      const path = route.path
+    if (viewState.showRoute && viewState.route) {
+      const path = viewState.route.path
         .map((id) => latlng(id))
         .filter((p): p is L.LatLngExpression => p !== null);
       if (path.length > 1) {
@@ -190,7 +204,7 @@
           opacity: 0.95,
         }).addTo(routeLayer!);
       }
-      for (const id of route.stops) {
+      for (const id of viewState.route.stops) {
         const p = latlng(id);
         if (!p) continue;
         L.circleMarker(p, {
@@ -203,10 +217,13 @@
       }
     }
 
-    const bounds = L.latLngBounds(
-      graph.nodes.map((n) => [n.lat, n.lng] as L.LatLngTuple),
-    );
-    map.fitBounds(bounds, { padding: [24, 24] });
+    if (!fitted) {
+      const bounds = L.latLngBounds(
+        graph.nodes.map((n) => [n.lat, n.lng] as L.LatLngTuple),
+      );
+      map.fitBounds(bounds, { padding: [24, 24] });
+      fitted = true;
+    }
     syncWeightLabels();
     drawProgress();
   }
@@ -228,20 +245,26 @@
   });
 
   $effect(() => {
-    void cpp;
-    void showTour;
-    void route;
+    void viewState.cpp;
+    void viewState.showOdd;
+    void viewState.showTour;
+    void viewState.showRoute;
+    void viewState.route;
     if (map) draw();
   });
 
   $effect(() => {
-    void tourStep;
+    void viewState.tourStep;
     if (map) drawProgress();
   });
 
   $effect(() => {
-    void showWeights;
+    void viewState.showWeights;
     syncWeightLabels();
+  });
+
+  $effect(() => {
+    if (visible && map) map.invalidateSize();
   });
 
   onDestroy(() => {
@@ -252,19 +275,32 @@
 
 <div class="relative h-full w-full">
   <div bind:this={container} class="h-full w-full bg-slate-100"></div>
-  <button
-    type="button"
-    onclick={() => (showWeights = !showWeights)}
-    class="absolute right-3 top-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs shadow transition hover:bg-white"
-  >
-    Bobot {showWeights ? "aktif" : "nonaktif"}
-  </button>
-  {#if cpp}
-    <div class="absolute bottom-3 left-3 z-500 rounded-lg bg-white/95 px-3 py-2 text-xs shadow">
-      <span class="inline-block h-2 w-4 rounded-sm bg-slate-500 align-middle"></span> ruas asli
-      <span class="ml-3 inline-block h-0.5 w-4 border-t-2 border-dashed border-red-600 align-middle"></span> ruas diulang
-      <span class="ml-3 inline-block h-2 w-4 rounded-sm bg-blue-700 align-middle"></span> rute patroli
-      <span class="ml-3 inline-block h-2 w-4 rounded-sm bg-green-400 align-middle"></span> dilalui
-    </div>
-  {/if}
+
+  <div class="absolute right-3 top-3 z-[500] w-40 rounded-lg bg-white/95 p-3 text-xs shadow">
+    <p class="mb-2 font-semibold text-neutral-700">Kontrol peta</p>
+    <label class="flex items-center gap-2 py-0.5 text-neutral-600">
+      <input type="checkbox" bind:checked={viewState.showWeights} class="accent-blue-600" />
+      Bobot (m)
+    </label>
+    <label class="flex items-center gap-2 py-0.5 text-neutral-600">
+      <input type="checkbox" bind:checked={viewState.showOdd} class="accent-blue-600" />
+      Simpul ganjil
+    </label>
+    <label class="flex items-center gap-2 py-0.5 text-neutral-600">
+      <input type="checkbox" bind:checked={viewState.showTour} class="accent-blue-600" />
+      Rute CPP
+    </label>
+    <label class="flex items-center gap-2 py-0.5 text-neutral-600">
+      <input type="checkbox" bind:checked={viewState.showRoute} class="accent-blue-600" />
+      Rute Dijkstra
+    </label>
+  </div>
+
+  <div class="absolute bottom-3 left-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs shadow">
+    <span class="inline-block h-2 w-4 rounded-sm bg-slate-500 align-middle"></span> ruas asli
+    <span class="ml-3 inline-block h-0.5 w-4 border-t-2 border-dashed border-red-600 align-middle"></span> diulang
+    <span class="ml-3 inline-block h-2 w-4 rounded-sm bg-blue-700 align-middle"></span> CPP
+    <span class="ml-3 inline-block h-2 w-4 rounded-sm bg-green-400 align-middle"></span> dilalui
+    <span class="ml-3 inline-block h-2 w-4 rounded-sm bg-sky-500 align-middle"></span> Dijkstra
+  </div>
 </div>

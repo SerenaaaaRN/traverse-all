@@ -6,8 +6,8 @@
   const odd = $derived([...degrees.values()].filter((d) => d.isOdd).length);
 </script>
 
-<div class="h-full overflow-y-auto p-8">
-  <div class="mx-auto max-w-3xl space-y-8 text-sm leading-relaxed text-neutral-700">
+<div>
+  <div class="space-y-6 text-xs leading-relaxed text-neutral-700">
     <header>
       <h1 class="text-xl font-bold text-neutral-900">Teori Graf &amp; Chinese Postman</h1>
       <p class="mt-1 text-neutral-500">Dasar yang dipakai dalam analisis patroli kilang.</p>

@@ -2,7 +2,15 @@
   import type { PatrolGraph } from "@algorithms/types";
   import { calculateDegrees } from "@algorithms/degrees";
 
-  let { graph }: { graph: PatrolGraph } = $props();
+  let {
+    graph,
+    selectedId = null,
+    onSelect,
+  }: {
+    graph: PatrolGraph;
+    selectedId?: string | null;
+    onSelect?: (id: string) => void;
+  } = $props();
 
   const rows = $derived.by(() => {
     const degrees = calculateDegrees(graph);
@@ -27,7 +35,14 @@
     </thead>
     <tbody>
       {#each rows as row (row.node.id)}
-        <tr class="border-t border-neutral-100 {row.isOdd ? 'bg-red-50' : ''}">
+        <tr
+          class="cursor-pointer border-t border-neutral-100 {row.node.id === selectedId
+            ? 'bg-green-50'
+            : row.isOdd
+              ? 'bg-red-50'
+              : ''}"
+          onclick={() => onSelect?.(row.node.id)}
+        >
           <td class="px-3 py-1.5 font-medium text-neutral-800">
             {row.node.id}
             {#if row.isOdd}
