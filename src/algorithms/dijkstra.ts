@@ -1,10 +1,12 @@
 import type { PatrolGraph } from "@algorithms/types";
 
+/** Jarak minimum dan lintasan simpul dari sumber ke tujuan. */
 export interface ShortestPath {
   distanceKm: number;
   path: string[];
 }
 
+/** Entri antrean pada pemindaian Dijkstra berbasis array. */
 interface QueueItem {
   id: string;
   dist: number;

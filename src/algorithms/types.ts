@@ -1,4 +1,4 @@
-/** Simpul jaringan jalan internal kilang. Koordinat asli hasil tracking GMaps. */
+/** Simpul jaringan jalan internal kilang dengan koordinat tracking asli. */
 export interface PatrolNode {
   id: string;
   label: string;
@@ -13,11 +13,13 @@ export interface PatrolEdge {
   weightKm: number;
 }
 
+/** Graf patroli yang terdiri dari simpul dan ruas jalan. */
 export interface PatrolGraph {
   nodes: PatrolNode[];
   edges: PatrolEdge[];
 }
 
+/** Derajat sebuah simpul beserta status ganjilnya. */
 export interface DegreeInfo {
   nodeId: string;
   degree: number;
@@ -33,7 +35,7 @@ export interface MatchingStrategyResult {
   paths: Map<string, string[]>;
 }
 
-/** Edge yang disalin (diulang) saat augmentasi CPP. */
+/** Ruas yang disalin (diulang) saat augmentasi CPP. */
 export interface AugmentedEdge {
   source: string;
   target: string;
@@ -41,6 +43,7 @@ export interface AugmentedEdge {
   augmented: boolean;
 }
 
+/** Keluaran lengkap pipeline CPP untuk sebuah graf. */
 export interface CPPResult {
   hasEulerCircuit: boolean;
   hasEulerPath: boolean;

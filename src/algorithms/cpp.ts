@@ -8,14 +8,16 @@ import type {
   PatrolGraph,
   AugmentedEdge,
 } from "@algorithms/types";
-import { calculateDegrees } from "./degrees";
+import { findOddNodes } from "./degrees";
 import { buildDistanceMatrix } from "./dijkstra";
 import { findGreedyMatching } from "./matching";
 import { hierholzer } from "./euler";
 import { isConnected } from "./connectivity";
 
+/** Simpul awal default saat titik awal tidak diberikan. */
 const TOUR_START = "P74";
 
+/** Mengubah lintasan pasangan menjadi ruas augmentasi beserta biayanya. */
 function augmentedEdgesAlongPath(
   graph: PatrolGraph,
   path: string[],
@@ -62,10 +64,7 @@ export function solveCPP(graph: PatrolGraph, startNode?: string): CPPResult {
     );
   }
 
-  const degrees = calculateDegrees(graph);
-  const oddNodes = Array.from(degrees.values())
-    .filter((d) => d.isOdd)
-    .map((d) => d.nodeId);
+  const oddNodes = findOddNodes(graph);
 
   const baseWeight = graph.edges.reduce((sum, e) => sum + e.weightKm, 0);
   const strategies: MatchingStrategyResult[] = [];
@@ -93,7 +92,7 @@ export function solveCPP(graph: PatrolGraph, startNode?: string): CPPResult {
     const circuit = hierholzer(
       graph.nodes.map((n) => n.id),
       graph.edges,
-      oddNodes[0] ?? "",
+      tourStart ?? oddNodes[0] ?? "",
     );
     return {
       hasEulerCircuit: false,

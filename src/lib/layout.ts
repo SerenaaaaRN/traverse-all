@@ -1,4 +1,4 @@
-import type { PatrolGraph } from "./types";
+import type { PatrolGraph } from "@algorithms/types";
 
 export interface Point {
   x: number;

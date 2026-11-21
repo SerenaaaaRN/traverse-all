@@ -1,7 +1,7 @@
 <script lang="ts">
   import DegreeTable from "@components/degree-table.svelte";
-  import { graphState } from "@lib/graphState.svelte";
-  import { viewState } from "@lib/viewState.svelte";
+  import { graphState } from "@lib/graph-state.svelte";
+  import { viewState } from "@lib/view-state.svelte";
 </script>
 
 <h1 class="text-lg font-bold text-neutral-900">Derajat Simpul</h1>

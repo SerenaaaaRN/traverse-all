@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { graphState } from "@lib/graphState.svelte";
-  import { calculateDegrees } from "@algorithms/degrees";
+  import { graphState } from "@lib/graph-state.svelte";
+  import { findOddNodes } from "@algorithms/degrees";
 
-  const degrees = $derived(calculateDegrees(graphState.graph()));
-  const odd = $derived([...degrees.values()].filter((d) => d.isOdd).length);
+  const odd = $derived(findOddNodes(graphState.graph()).length);
 </script>
 
 <div>

@@ -1,6 +1,7 @@
 import type { PatrolGraph } from "@algorithms/types";
 import { dijkstraShortestPath, type ShortestPath } from "@algorithms/dijkstra";
 
+/** Rute terpendek melalui seluruh waypoint beserta segmennya. */
 export interface RouteResult {
   stops: string[];
   segments: ShortestPath[];
@@ -8,6 +9,7 @@ export interface RouteResult {
   totalDistanceKm: number;
 }
 
+/** Merangkai Dijkstra antar waypoint menjadi satu rute utuh. */
 export function findRouteThroughStops(
   graph: PatrolGraph,
   stops: string[],

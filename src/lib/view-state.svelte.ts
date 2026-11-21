@@ -1,20 +1,18 @@
 import type { CPPResult } from "@algorithms/types";
 import { solveCPP } from "@algorithms/cpp";
 import { findRouteThroughStops, type RouteResult } from "@algorithms/route";
-import { graphState } from "./graphState.svelte";
+import { graphState } from "./graph-state.svelte";
 
 class ViewState {
   startNode = $state("P74");
   startNodeValid = $derived(graphState.nodes.some((n) => n.id === this.startNode));
-  startNodeDraft = $state("P74");
 
-  commitStartNode(): void {
-    const value = this.startNodeDraft.trim();
-    if (value !== this.startNode) this.startNode = value;
+  commitStartNode(value: string): void {
+    const next = value.trim();
+    if (next !== this.startNode) this.startNode = next;
   }
 
   resetStartNode(): void {
-    this.startNodeDraft = "P74";
     this.startNode = "P74";
   }
 
@@ -28,6 +26,14 @@ class ViewState {
       return null;
     }
   });
+
+  baselineKm = $derived(2 * graphState.edges.reduce((sum, e) => sum + e.weightKm, 0));
+
+  savingPct = $derived(
+    this.cpp
+      ? ((this.baselineKm - this.cpp.totalInspectionDistanceKm) / this.baselineKm) * 100
+      : 0,
+  );
 
   tourStep = $state<number | null>(null);
   tourPlaying = $state(false);

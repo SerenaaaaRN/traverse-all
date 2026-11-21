@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { viewState } from "@lib/viewState.svelte";
+  import { viewState } from "@lib/view-state.svelte";
 </script>
 
 <div class="rounded-lg border border-neutral-200 p-3">

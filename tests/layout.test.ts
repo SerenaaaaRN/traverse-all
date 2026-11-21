@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { forceDirectedLayout } from "@algorithms/layout";
+import { forceDirectedLayout } from "@lib/layout";
 import type { PatrolGraph } from "@algorithms/types";
 import { patrolEdges } from "@data/edges";
 import { patrolNodes } from "@data/nodes";

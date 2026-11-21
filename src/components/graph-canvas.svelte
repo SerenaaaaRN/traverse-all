@@ -1,8 +1,12 @@
 <script lang="ts">
-  import { forceDirectedLayout, type Point } from "@algorithms/layout";
+  import { forceDirectedLayout, type Point } from "@lib/layout";
   import { calculateDegrees } from "@algorithms/degrees";
-  import { graphState } from "@lib/graphState.svelte";
-  import { viewState } from "@lib/viewState.svelte";
+  import { pairKey } from "@lib/pair-key";
+  import { graphState } from "@lib/graph-state.svelte";
+  import { GRAPH_COLORS } from "@lib/graph-colors";
+  import { viewState } from "@lib/view-state.svelte";
+  import GraphControls from "@components/graph-controls.svelte";
+  import GraphLegend from "@components/graph-legend.svelte";
 
   let svgEl: SVGSVGElement | null = null;
 
@@ -24,10 +28,6 @@
   const visited = $derived(new Set(circuit.slice(0, step + 1)));
   const routePath = $derived(viewState.route?.path ?? []);
   const startId = $derived(viewState.startNodeValid ? viewState.startNode : "P74");
-
-  function pairKey(a: string, b: string): string {
-    return a < b ? `${a}|${b}` : `${b}|${a}`;
-  }
 
   const visitedEdges = $derived.by(() => {
     const keys = new Set<string>();
@@ -134,7 +134,7 @@
             y1={a.y}
             x2={b.x}
             y2={b.y}
-            stroke={current ? "#15803d" : visited ? "#4ade80" : "#94a3b8"}
+            stroke={current ? GRAPH_COLORS.current : visited ? GRAPH_COLORS.visited : "#94a3b8"}
             stroke-width={current ? 6 : visited ? 3 : 2}
           />
           {#if viewState.showWeights}
@@ -156,7 +156,7 @@
           {@const a = id === undefined ? undefined : positions.get(id)}
           {@const b = nextId === undefined ? undefined : positions.get(nextId)}
           {#if a && b}
-            <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#1d4ed8" stroke-width="2" opacity="0.4" />
+            <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={GRAPH_COLORS.tour} stroke-width="2" opacity="0.4" />
           {/if}
         {/each}
       {/if}
@@ -166,7 +166,7 @@
           {@const a = positions.get(edge.source)}
           {@const b = positions.get(edge.target)}
           {#if a && b}
-            <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#dc2626" stroke-width="3" stroke-dasharray="6 6" />
+            <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={GRAPH_COLORS.odd} stroke-width="3" stroke-dasharray="6 6" />
           {/if}
         {/each}
       {/if}
@@ -177,7 +177,7 @@
           {@const a = id === undefined ? undefined : positions.get(id)}
           {@const b = nextId === undefined ? undefined : positions.get(nextId)}
           {#if a && b}
-            <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#0ea5e9" stroke-width="6" />
+            <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={GRAPH_COLORS.route} stroke-width="6" />
           {/if}
         {/each}
       {/if}
@@ -190,7 +190,7 @@
             cx={p.x}
             cy={p.y}
             r={node.id === startId ? 10 : odd ? 8 : 6}
-            fill={node.id === startId || visited.has(node.id) ? "#15803d" : odd ? "#dc2626" : "#2563eb"}
+            fill={node.id === startId || visited.has(node.id) ? GRAPH_COLORS.current : odd ? GRAPH_COLORS.odd : "#2563eb"}
             stroke="white"
             stroke-width="2"
             role="button"
@@ -207,59 +207,9 @@
     </g>
   </svg>
 
-  <div class="absolute bottom-3 left-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs shadow">
-    <span class="inline-block h-2 w-4 rounded-sm bg-slate-400 align-middle"></span> ruas asli
-    <span class="ml-3 inline-block h-0.5 w-4 border-t-2 border-dashed border-red-600 align-middle"></span> diulang
-    <span class="ml-3 inline-block h-2 w-4 rounded-sm bg-blue-700 align-middle"></span> CPP
-    <span class="ml-3 inline-block h-2 w-4 rounded-sm bg-green-700 align-middle"></span> dilalui
-    <span class="ml-3 inline-block h-2 w-4 rounded-sm bg-sky-500 align-middle"></span> Dijkstra
-  </div>
+  <GraphLegend />
 
-  <div class="absolute right-3 top-3 z-[500] w-40 rounded-lg bg-white/95 p-3 text-xs shadow">
-    <div class="mb-3">
-      <p class="mb-1 font-semibold text-neutral-700">Titik awal</p>
-      <div class="flex gap-1">
-        <input
-          type="text"
-          bind:value={viewState.startNodeDraft}
-          onchange={() => viewState.commitStartNode()}
-          list="start-options-graf"
-          placeholder="P74"
-          class="min-w-0 flex-1 rounded border border-neutral-300 px-1.5 py-1 text-xs"
-        />
-        <button
-          type="button"
-          onclick={() => viewState.resetStartNode()}
-          class="rounded border border-neutral-300 px-1.5 py-1 text-xs text-neutral-600 hover:bg-neutral-50"
-        >Reset</button>
-      </div>
-      <datalist id="start-options-graf">
-        {#each graphState.nodes as node (node.id)}
-          <option value={node.id}></option>
-        {/each}
-      </datalist>
-      {#if !viewState.startNodeValid}
-        <p class="mt-1 text-[10px] text-amber-700">Tidak ditemukan — pakai P74</p>
-      {/if}
-    </div>
-    <p class="mb-2 font-semibold text-neutral-700">Kontrol graf</p>
-    <label class="flex items-center gap-2 py-0.5 text-neutral-600">
-      <input type="checkbox" bind:checked={viewState.showWeights} class="accent-blue-600" />
-      Bobot (m)
-    </label>
-    <label class="flex items-center gap-2 py-0.5 text-neutral-600">
-      <input type="checkbox" bind:checked={viewState.showOdd} class="accent-blue-600" />
-      Simpul ganjil
-    </label>
-    <label class="flex items-center gap-2 py-0.5 text-neutral-600">
-      <input type="checkbox" bind:checked={viewState.showTour} class="accent-blue-600" />
-      Rute CPP
-    </label>
-    <label class="flex items-center gap-2 py-0.5 text-neutral-600">
-      <input type="checkbox" bind:checked={viewState.showRoute} class="accent-blue-600" />
-      Rute Dijkstra
-    </label>
-  </div>
+  <GraphControls title="Kontrol graf" listId="start-options-graf" />
 
   <button
     type="button"

@@ -1,14 +1,7 @@
 <script lang="ts">
-  import { graphState } from "@lib/graphState.svelte";
-  import { viewState } from "@lib/viewState.svelte";
+  import { viewState } from "@lib/view-state.svelte";
 
   const cpp = $derived(viewState.cpp);
-  const baseline = $derived(
-    cpp ? 2 * graphState.edges.reduce((s, e) => s + e.weightKm, 0) : 0,
-  );
-  const saving = $derived(
-    cpp ? ((baseline - cpp.totalInspectionDistanceKm) / baseline) * 100 : 0,
-  );
 </script>
 
 <h1 class="text-lg font-bold text-neutral-900">Perbandingan Rute</h1>
@@ -18,7 +11,7 @@
   <div class="mt-4 space-y-2">
     <div class="rounded-lg border border-neutral-200 p-3">
       <p class="text-xs font-medium text-neutral-600">Baseline — semua ruas 2×</p>
-      <p class="mt-1 font-mono text-lg font-semibold text-neutral-700">{baseline.toFixed(3)} km</p>
+      <p class="mt-1 font-mono text-lg font-semibold text-neutral-700">{viewState.baselineKm.toFixed(3)} km</p>
       <p class="mt-1 text-[10px] text-neutral-400">Setiap ruas pergi dan pulang, tanpa optimasi.</p>
     </div>
     <div class="rounded-lg border border-blue-200 bg-blue-50 p-3">
@@ -35,7 +28,7 @@
   <div class="mt-4 grid grid-cols-3 gap-2">
     <div class="rounded-lg border border-neutral-200 p-2.5">
       <p class="text-[10px] text-neutral-500">Hemat</p>
-      <p class="text-base font-bold text-green-700">{saving.toFixed(2)}%</p>
+      <p class="text-base font-bold text-green-700">{viewState.savingPct.toFixed(2)}%</p>
     </div>
     <div class="rounded-lg border border-neutral-200 p-2.5">
       <p class="text-[10px] text-neutral-500">Diulang</p>
@@ -50,7 +43,7 @@
   <div class="mt-5 rounded-lg bg-neutral-50 p-3 text-xs leading-relaxed text-neutral-600">
     <p>
       Baseline mengandaikan petugas menempuh setiap ruas dua kali, sehingga totalnya
-      {baseline.toFixed(3)} km. CPP hanya mengulang ruas yang diperlukan untuk membuat
+      {viewState.baselineKm.toFixed(3)} km. CPP hanya mengulang ruas yang diperlukan untuk membuat
       seluruh derajat simpul genap.
     </p>
     <p class="mt-2">

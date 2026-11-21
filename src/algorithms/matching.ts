@@ -5,17 +5,17 @@
  */
 import type { MatchingStrategyResult } from "@algorithms/types";
 import type { ShortestPath } from "./dijkstra";
+import { pairKey } from "@lib/pair-key";
 
+/** Matriks jarak dan lintasan terpendek antar pasangan simpul ganjil. */
 export type DistanceMatrix = Map<string, Map<string, ShortestPath>>;
 
-function pairKey(u: string, v: string): string {
-  return u < v ? `${u}|${v}` : `${v}|${u}`;
-}
-
+/** Hasil matching kosong untuk jumlah simpul ganjil yang tidak valid. */
 function emptyResult(executed: boolean): MatchingStrategyResult {
   return { strategy: "greedy", pairs: [], totalCostKm: 0, executed, paths: new Map() };
 }
 
+/** Memasangkan simpul ganjil dengan aturan pasangan terdekat. */
 export function findGreedyMatching(
   oddNodes: string[],
   matrix: DistanceMatrix,

@@ -1,6 +1,5 @@
 import type { PatrolNode } from "@algorithms/types";
 
-/** 73 titik tracking jalan internal Kilang Pertamina Plaju. */
 export const patrolNodes = [
   { id: "P01", label: "Misalkan ini a", lat: -2.991494, lng: 104.827243 },
   { id: "P02", label: "", lat: -2.991496, lng: 104.828756 },

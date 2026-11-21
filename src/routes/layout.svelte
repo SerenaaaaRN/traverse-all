@@ -3,7 +3,7 @@
   import { p, route } from "sv-router/generated";
   import GraphView from "@components/graph-view.svelte";
   import GraphCanvas from "@components/graph-canvas.svelte";
-  import { viewState } from "@lib/viewState.svelte";
+  import { viewState } from "@lib/view-state.svelte";
 
   let { children }: { children: Snippet } = $props();
 

@@ -38,7 +38,7 @@ menggunakan **Chinese Postman Problem (CPP)**.
 ```text
 src/data/nodes.ts ── patrolNodes (74)
 src/data/edges.ts ── patrolEdges (115)
-        │ import statis, dirakit di graphState.svelte.ts
+        │ import statis, dirakit di graph-state.svelte.ts
         ▼
 PatrolGraph { nodes, edges }
         │
@@ -92,7 +92,7 @@ terbuka; tidak ada pembedaan permission.
 │   │   ├── nodes.ts           # 74 simpul, satisfies PatrolNode[]
 │   │   └── edges.ts           # 115 ruas, satisfies PatrolEdge[]
 │   ├── lib/
-│   │   └── graphState.svelte.ts  # module rune: nodes, edges, graph(), nodeById()
+│   │   └── graph-state.svelte.ts  # module rune: nodes, edges, graph(), nodeById()
 │   ├── components/            # FLAT, kebab-case
 │   │   ├── graph-view.svelte  # Leaflet + OSM (onMount/onDestroy, layer groups)
 │   │   ├── degree-table.svelte
@@ -132,7 +132,7 @@ langsung dari `$derived` di halaman.
   halaman di `src/routes/`.
 - Imports memakai alias: `@components/*`, `@algorithms/*`, `@data/*`, `@lib/*` (`@ui/*` ada tapi tidak dipakai).
 - Svelte 5 runes: `$state` di module rune, `$props()`, `$derived` / `$derived.by()`, `$effect`.
-- `graphState.svelte.ts` adalah satu-satunya state global; jangan props-drill graf antar route.
+- `graph-state.svelte.ts` adalah satu-satunya state global; jangan props-drill graf antar route.
 - Leaflet: inisialisasi di `onMount`, `map.remove()` di `onDestroy`. **Jangan** buat ulang
   instance map saat prop berubah — cukup `clearLayers()` + isi ulang layer group.
 - Warna semantik: merah = simpul ganjil / ruas diulang, hijau = `P74` + simpul/ruas yang dilalui demo, biru = rute patroli, abu = ruas asli.
@@ -164,7 +164,7 @@ langsung dari `$derived` di halaman.
 | Routing | `sv-router` 0.19 (file-based, generated `.router/`) |
 | UI / styling | Tailwind CSS 4 via `@tailwindcss/vite`, `h-[100dvh]` layout |
 | Peta | Leaflet 1.9 + tile OpenStreetMap (`preferCanvas: true`) |
-| State | Module rune `$state` di `src/lib/graphState.svelte.ts` |
+| State | Module rune `$state` di `src/lib/graph-state.svelte.ts` |
 | Data | Objek TypeScript statis (`satisfies`), tanpa fetch |
 | Test | `bun test` (50 test) |
 | Sisa dependensi | `cytoscape` + `@types/cytoscape` masih terpasang tapi **tidak dipakai** |
@@ -285,7 +285,7 @@ statis dan ikut terbundle ke JavaScript produksi (~230 kB).
 
 Ganti peran "database" dengan:
 - `src/data/nodes.ts` + `edges.ts` → penyimpanan data.
-- `graphState.svelte.ts` → akses data saat runtime.
+- `graph-state.svelte.ts` → akses data saat runtime.
 - `tests/*.test.ts` → pengujian algoritma (known-answer).
 
 ---

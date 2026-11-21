@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { graphState } from "@lib/graphState.svelte";
-  import { viewState } from "@lib/viewState.svelte";
-  import { calculateDegrees } from "@algorithms/degrees";
+  import { graphState } from "@lib/graph-state.svelte";
+  import { viewState } from "@lib/view-state.svelte";
+  import { calculateDegrees, findOddNodes } from "@algorithms/degrees";
 
   const degrees = $derived(calculateDegrees(graphState.graph()));
-  const oddCount = $derived([...degrees.values()].filter((d) => d.isOdd).length);
+  const oddCount = $derived(findOddNodes(graphState.graph()).length);
   const selected = $derived(
     viewState.selectedNode ? graphState.nodeById(viewState.selectedNode) : undefined,
   );

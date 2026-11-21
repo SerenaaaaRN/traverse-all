@@ -1,6 +1,5 @@
 import type { PatrolEdge } from "@algorithms/types";
 
-/** 112 ruas jalan; bobot dalam kilometer (meter ÷ 1000). */
 export const patrolEdges = [
   { source: "P01", target: "P02", weightKm: 0.35 },
   { source: "P01", target: "P19", weightKm: 0.21 },

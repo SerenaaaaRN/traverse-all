@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { graphState } from "@lib/graphState.svelte";
-  import { viewState } from "@lib/viewState.svelte";
+  import { graphState } from "@lib/graph-state.svelte";
+  import { viewState } from "@lib/view-state.svelte";
 
   const graph = $derived(graphState.graph());
   const result = $derived(viewState.route);

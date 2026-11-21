@@ -1,14 +1,8 @@
 <script lang="ts">
-  import { graphState } from "@lib/graphState.svelte";
-  import { viewState } from "@lib/viewState.svelte";
+  import { viewState } from "@lib/view-state.svelte";
   import TourPlayer from "@components/tour-player.svelte";
 
   const cpp = $derived(viewState.cpp);
-  const totalKm = $derived(graphState.edges.reduce((s, e) => s + e.weightKm, 0));
-  const baselineKm = $derived(2 * totalKm);
-  const savingPct = $derived(
-    cpp ? ((baselineKm - cpp.totalInspectionDistanceKm) / baselineKm) * 100 : 0,
-  );
 
   const circuit = $derived(cpp?.eulerCircuit ?? []);
   const step = $derived(viewState.tourStep ?? 0);
@@ -43,7 +37,7 @@
     </div>
     <div class="rounded-lg bg-green-50 p-2.5 text-green-800">
       <p class="text-[10px]">Hemat vs baseline</p>
-      <p class="text-sm font-bold">{savingPct.toFixed(2)}%</p>
+      <p class="text-sm font-bold">{viewState.savingPct.toFixed(2)}%</p>
     </div>
   </div>
 

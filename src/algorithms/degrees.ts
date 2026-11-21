@@ -21,6 +21,7 @@ export function calculateDegrees(graph: PatrolGraph): Map<string, DegreeInfo> {
   return result;
 }
 
+/** Mengembalikan daftar id simpul berderajat ganjil. */
 export function findOddNodes(graph: PatrolGraph): string[] {
   const degrees = calculateDegrees(graph);
   return Array.from(degrees.values())

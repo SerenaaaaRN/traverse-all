@@ -395,7 +395,7 @@ src/
 ├── data/
 │   ├── nodes.ts         # 74 simpul (typed)
 │   └── edges.ts         # 115 ruas (typed)
-├── lib/graphState.svelte.ts
+├── lib/graph-state.svelte.ts
 ├── components/          # graph-view.svelte (Leaflet), degree-table.svelte
 ├── routes/              # index, analysis, comparison, theory
 └── tests/               # bun test

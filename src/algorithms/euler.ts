@@ -10,6 +10,7 @@ export interface HierholzerEdge {
   target: string;
 }
 
+/** Membentuk sirkuit/lintasan Euler dari seluruh ruas yang diberikan. */
 export function hierholzer(
   nodeIds: string[],
   edges: HierholzerEdge[],
