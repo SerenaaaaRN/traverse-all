@@ -36,17 +36,17 @@ menggunakan **Chinese Postman Problem (CPP)**.
 **Alur data (faktual):**
 
 ```text
-src/data/nodes.ts ── patrolNodes (73)
-src/data/edges.ts ── patrolEdges (112)
+src/data/nodes.ts ── patrolNodes (74)
+src/data/edges.ts ── patrolEdges (115)
         │ import statis, dirakit di graphState.svelte.ts
         ▼
 PatrolGraph { nodes, edges }
         │
-        ├─ calculateDegrees  → 38 simpul ganjil
+        ├─ calculateDegrees  → 40 simpul ganjil
         ├─ buildDistanceMatrix (Dijkstra)
-        ├─ findGreedyMatching → 19 pasangan, 4,259 km
+        ├─ findGreedyMatching → 20 pasangan, 4,829 km
         ├─ augmentasi edge sepanjang path pasangan
-        └─ hierholzer → 147 langkah, 22,904 km
+        └─ hierholzer → 153 langkah, 24,168 km (mulai P74)
         │
         ▼
 $derived di routes → props ke graph-view.svelte / degree-table.svelte → Leaflet + OSM
@@ -56,16 +56,18 @@ $derived di routes → props ke graph-view.svelte / degree-table.svelte → Leaf
 
 - Graf **undirected**, satu edge unik per pasangan simpul.
 - Bobot `weightKm` = jarak geometris meter ÷ 1000 (**bukan** panjang jalan aktual).
-- Titik awal tour: `P01` (konstanta `START` di `graph-view.svelte`).
+- Titik awal tour: `P74` (gerbang kilang) — konstanta `TOUR_START` / parameter `startNode` di `cpp.ts`.
+  Konstanta `START` di `graph-view.svelte` hanya mewarnai marker hijau.
 - CPP: setiap ruas ditempuh minimal 1×, rute tertutup, total minimum **menurut strategi greedy**.
 - `hasEulerCircuit` / `hasEulerPath` di `CPPResult` menggambarkan **graf awal**, bukan graf hasil augmentasi.
-- Tidak ada brute force / blossom: 38 simpul ganjil ⇒ 37!! kombinasi; strategi dipilih agar bisa dijelaskan di presentasi.
+- Tidak ada brute force / blossom: 40 simpul ganjil ⇒ 39!! kombinasi; strategi dipilih agar bisa dijelaskan di presentasi.
 
 **Fitur sudah dibangun:** peta Leaflet + overlay tour, halaman analisis, perbandingan,
-teori, tabel derajat, 44 test otomatis, dokumentasi (`README.md`, `GUIDE.md`, `docs/Laporan.md`).
+teori, tabel derajat, demo animasi tour (play/pause/step), rute terpendek Dijkstra lewat
+waypoint, 50 test otomatis, dokumentasi (`README.md`, `GUIDE.md`, `docs/Laporan.md`).
 
-**Belum dibangun:** backend/API, database, auth/RBAC, form, pagination, animasi tour
-play/pause/step, export CSV/JSON, i18n, konfigurasi deploy.
+**Belum dibangun:** backend/API, database, auth/RBAC, form, pagination, k-shortest paths,
+export CSV/JSON, i18n, konfigurasi deploy.
 
 **Peran & scope pengguna:** satu pengguna (mahasiswa/presenter), tanpa login. Semua halaman
 terbuka; tidak ada pembedaan permission.
@@ -82,22 +84,25 @@ terbuka; tidak ada pembedaan permission.
 │   │   ├── degrees.ts         # calculateDegrees, findOddNodes
 │   │   ├── connectivity.ts    # isConnected (BFS)
 │   │   ├── dijkstra.ts        # dijkstraShortestPath, buildDistanceMatrix
+│   │   ├── route.ts           # findRouteThroughStops (A→B lewat waypoint)
 │   │   ├── matching.ts        # findGreedyMatching (pasangan terdekat)
 │   │   ├── euler.ts           # hierholzer
 │   │   └── cpp.ts             # solveCPP (orkestrasi pipeline)
 │   ├── data/
-│   │   ├── nodes.ts           # 73 simpul, satisfies PatrolNode[]
-│   │   └── edges.ts           # 112 ruas, satisfies PatrolEdge[]
+│   │   ├── nodes.ts           # 74 simpul, satisfies PatrolNode[]
+│   │   └── edges.ts           # 115 ruas, satisfies PatrolEdge[]
 │   ├── lib/
 │   │   └── graphState.svelte.ts  # module rune: nodes, edges, graph(), nodeById()
 │   ├── components/            # FLAT, kebab-case
 │   │   ├── graph-view.svelte  # Leaflet + OSM (onMount/onDestroy, layer groups)
-│   │   └── degree-table.svelte
+│   │   ├── degree-table.svelte
+│   │   └── tour-player.svelte  # kontrol play/pause/step demo lintasan
 │   ├── routes/                # file-based routing (sv-router)
 │   │   ├── layout.svelte      # nav persist + {@render children()}
 │   │   ├── index.svelte       # peta jaringan
-│   │   ├── analysis.svelte    # metrik + tabel + peta dengan overlay
+│   │   ├── analysis.svelte    # metrik + tabel + peta + demo tour
 │   │   ├── comparison.svelte  # baseline vs CPP
+│   │   ├── route.svelte       # perencana rute Dijkstra + waypoint
 │   │   └── theory.svelte      # definisi + contoh kecil
 │   ├── app.css                # @import "tailwindcss"
 │   ├── app.svelte             # <Router /> dari sv-router
@@ -105,7 +110,7 @@ terbuka; tidak ada pembedaan permission.
 ├── tests/                     # bun test
 │   ├── helpers.ts             # makeGraph, matrixFromGraph
 │   ├── cpp.test.ts / degrees.test.ts / dijkstra.test.ts
-│   └── euler.test.ts / matching.test.ts
+│   └── euler.test.ts / matching.test.ts / route.test.ts
 ├── docs/Laporan.md            # laporan akademik (Bab 1–4)
 ├── .router/                   # GENERATED oleh sv-router (gitignored)
 ├── vite.config.ts             # plugin: svelte, tailwindcss, router; 5 alias
@@ -130,7 +135,7 @@ langsung dari `$derived` di halaman.
 - `graphState.svelte.ts` adalah satu-satunya state global; jangan props-drill graf antar route.
 - Leaflet: inisialisasi di `onMount`, `map.remove()` di `onDestroy`. **Jangan** buat ulang
   instance map saat prop berubah — cukup `clearLayers()` + isi ulang layer group.
-- Warna semantik: merah = simpul ganjil / ruas diulang, hijau = `P01`, biru = rute patroli, abu = ruas asli.
+- Warna semantik: merah = simpul ganjil / ruas diulang, hijau = `P74` + simpul/ruas yang dilalui demo, biru = rute patroli, abu = ruas asli.
 - Tailwind utilitas saja; `src/app.css` hanya `@import "tailwindcss"`.
 - Navigasi via `p()` dari `sv-router/generated`; jalankan `bun run gen-routes` setelah menambah route.
 
@@ -161,7 +166,7 @@ langsung dari `$derived` di halaman.
 | Peta | Leaflet 1.9 + tile OpenStreetMap (`preferCanvas: true`) |
 | State | Module rune `$state` di `src/lib/graphState.svelte.ts` |
 | Data | Objek TypeScript statis (`satisfies`), tanpa fetch |
-| Test | `bun test` (44 test) |
+| Test | `bun test` (50 test) |
 | Sisa dependensi | `cytoscape` + `@types/cytoscape` masih terpasang tapi **tidak dipakai** |
 
 ### Technical Decisions
@@ -169,7 +174,7 @@ langsung dari `$derived` di halaman.
 | Keputusan | Alasan singkat |
 |---|---|
 | Data TypeScript statis, bukan JSON + validator | Validasi saat compile, tanpa barrel / runtime guard |
-| Tanpa brute force & blossom | 38 odd ⇒ 37!!; materi kuliah & presentasi lebih sederhana |
+| Tanpa brute force & blossom | 40 odd ⇒ 39!!; materi kuliah & presentasi lebih sederhana |
 | Greedy "pasangan terdekat" | O(k² log k), mudah dijelaskan |
 | Leaflet + OSM, bukan Cytoscape | Koordinat `lat/lng` asli, peta geografis nyata |
 | Module rune, bukan props drilling | State persisten antar route |
@@ -208,7 +213,7 @@ Status migrasi yang sudah selesai (dapat dicek dari git log):
 
 | Dari | Ke |
 |---|---|
-| Transportasi Palembang (pohon) | Jaringan jalan kilang (graf, μ = 40) |
+| Transportasi Palembang (pohon) | Jaringan jalan kilang (graf, μ = 42) |
 | `transmusi.json` + `routes.ts` | `nodes.ts` + `edges.ts` |
 | `nodes.json` + `index.ts` (validator ~120 baris) | data statis `satisfies` |
 | `components/domain/*` | `components/*` flat, kebab-case |
@@ -249,7 +254,7 @@ Tidak ada peran / permission check di kode.
 
 | Peran | Scope | Halaman |
 |---|---|---|
-| Pengguna tunggal (mahasiswa / presenter) | Akses penuh, tanpa login | `/`, `/analysis`, `/comparison`, `/theory` |
+| Pengguna tunggal (mahasiswa / presenter) | Akses penuh, tanpa login | `/`, `/analysis`, `/comparison`, `/route`, `/theory` |
 
 Tidak ada `role`, `permission`, atau middleware otorisasi. Jangan mengasumsikan multi-user.
 
@@ -263,7 +268,7 @@ Tidak ada query/mutation library, tidak ada fetch, tidak ada pagination.
 |---|---|
 | Query | `solveCPP(graph)` sinkron, dipanggil lewat `$derived` |
 | Mutation | Tidak ada; `graphState.nodes` / `.edges` statis |
-| Pagination / infinite scroll | Tidak ada (73 simpul, 112 ruas) |
+| Pagination / infinite scroll | Tidak ada (74 simpul, 115 ruas) |
 | Cache `staleTime` / `gcTime` | Tidak ada; `$derived` menghitung ulang saat dependency berubah |
 | Loading / error async | Tidak ada; satu-satunya error ialah guard `solveCPP` |
 | Tabel / list | `degree-table.svelte`: `$derived.by()` + `{#each rows as row (row.node.id)}` |
@@ -348,7 +353,7 @@ Tile OSM dimuat dari URL publik tetap di `graph-view.svelte` (bukan env var).
 - [ ] Import `@components/GraphView.svelte` (nama file sudah kebab-case).
 - [ ] Membuat ulang `L.map()` setiap perubahan prop — cukup perbarui layer group.
 - [ ] Lupa `map.remove()` di `onDestroy` (memory leak).
-- [ ] Hardcode angka 73 / 112 / 22,904 di komponen; ambil dari hasil komputasi.
+- [ ] Hardcode angka 74 / 115 / 24,168 di komponen; ambil dari hasil komputasi.
 - [ ] Memakai API Svelte 4 (`on:click`, `$:`) alih-alih runes.
 
 **Workflow**
@@ -360,7 +365,7 @@ Tile OSM dimuat dari URL publik tetap di `graph-view.svelte` (bukan env var).
 ## Loading & Skeleton Strategy
 
 - Tidak ada async data fetching ⇒ **tidak ada skeleton / spinner untuk data**.
-- Komputasi CPP sinkron dan cepat (< 1 detik untuk 73 simpul).
+- Komputasi CPP sinkron dan cepat (< 1 detik untuk 74 simpul).
 - Peta: container `bg-slate-100` sebagai fallback saat tile OSM belum/ gagal dimuat;
   layer graf (polyline + circleMarker) tetap tampil tanpa koneksi internet.
 - `map.fitBounds(bounds, { padding: [24, 24] })` dipanggil setelah layer digambar.
@@ -370,7 +375,7 @@ Tile OSM dimuat dari URL publik tetap di `graph-view.svelte` (bukan env var).
 
 ## Performance & Latency
 
-- Dijkstra: implementasi array sederhana; cukup untuk 38 odd node (kompleksitas praktis O(k(E + V log V))).
+- Dijkstra: implementasi array sederhana; cukup untuk 40 odd node (kompleksitas praktis O(k(E + V log V))).
 - Greedy matching: O(k² log k); tidak ada brute force.
 - Hindari `cy` / map re-inisialisasi; `$effect` hanya menggambar ulang layer.
 - `$derived` di route mencegah komputasi ulang tanpa perubahan dependency.

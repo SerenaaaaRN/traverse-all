@@ -114,4 +114,7 @@ export const patrolEdges = [
   { source: "P56", target: "P54", weightKm: 0.064 },
   { source: "P54", target: "P53", weightKm: 0.509 },
   { source: "P53", target: "P48", weightKm: 0.264 },
+  { source: "P74", target: "P49", weightKm: 0.264 },
+  { source: "P74", target: "P49", weightKm: 0.140 },
+  { source: "P74", target: "P53", weightKm: 0.290 },
 ] satisfies PatrolEdge[];

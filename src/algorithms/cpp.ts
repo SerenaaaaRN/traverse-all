@@ -14,6 +14,8 @@ import { findGreedyMatching } from "./matching";
 import { hierholzer } from "./euler";
 import { isConnected } from "./connectivity";
 
+const TOUR_START = "P74";
+
 function augmentedEdgesAlongPath(
   graph: PatrolGraph,
   path: string[],
@@ -26,12 +28,14 @@ function augmentedEdgesAlongPath(
     const from = path[i];
     const to = path[i + 1];
     if (from === undefined || to === undefined) continue;
-    const weight =
-      graph.edges.find(
+    const weights = graph.edges
+      .filter(
         (e) =>
           (e.source === from && e.target === to) ||
           (e.source === to && e.target === from),
-      )?.weightKm ?? 0;
+      )
+      .map((e) => e.weightKm);
+    const weight = weights.length > 0 ? Math.min(...weights) : 0;
     edges.push({ source: from, target: to, weightKm: weight, augmented: true });
     pairs.push({ source: from, target: to });
     cost += weight;
@@ -44,7 +48,11 @@ function augmentedEdgesAlongPath(
  * Menyelesaikan CPP pada graf undirected. Melempar Error untuk graf kosong
  * atau disconnected — precondition yang sama dengan NetworkX.
  */
-export function solveCPP(graph: PatrolGraph): CPPResult {
+export function solveCPP(graph: PatrolGraph, startNode?: string): CPPResult {
+  const tourStart =
+    startNode ??
+    (graph.nodes.some((n) => n.id === TOUR_START) ? TOUR_START : undefined);
+
   if (graph.nodes.length === 0) {
     throw new Error("Graf kosong: tidak ada simpul untuk dianalisis.");
   }
@@ -66,7 +74,7 @@ export function solveCPP(graph: PatrolGraph): CPPResult {
     const circuit = hierholzer(
       graph.nodes.map((n) => n.id),
       graph.edges,
-      graph.nodes[0]?.id ?? "",
+      tourStart ?? graph.nodes[0]?.id ?? "",
     );
     return {
       hasEulerCircuit: circuit !== null,
@@ -135,7 +143,7 @@ export function solveCPP(graph: PatrolGraph): CPPResult {
   const finalCircuit = hierholzer(
     graph.nodes.map((n) => n.id),
     [...graph.edges, ...augmentedPairs],
-    oddNodes[0] ?? graph.nodes[0]?.id ?? "",
+    tourStart ?? oddNodes[0] ?? graph.nodes[0]?.id ?? "",
   );
 
   return {

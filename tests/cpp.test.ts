@@ -145,4 +145,37 @@ describe("solveCPP", () => {
       expect(traversed.get(key)).toBe(count);
     }
   });
+
+  test("titik awal tour selalu P74 (semua genap)", () => {
+    const graph = makeGraph(
+      ["P74", "A", "B", "C"],
+      [
+        ["P74", "A", 1],
+        ["A", "B", 1],
+        ["B", "C", 1],
+        ["C", "P74", 1],
+      ],
+    );
+    const result = solveCPP(graph);
+    expect(result.eulerCircuit?.[0]).toBe("P74");
+    expect(result.eulerCircuit?.at(-1)).toBe("P74");
+  });
+
+  test("titik awal tour P74 setelah augmentasi 4 simpul ganjil", () => {
+    const graph = makeGraph(
+      ["P74", "A", "B", "C", "D", "E"],
+      [
+        ["P74", "A", 1],
+        ["A", "B", 1],
+        ["B", "C", 1],
+        ["C", "P74", 1],
+        ["B", "D", 1],
+        ["C", "E", 1],
+      ],
+    );
+    const result = solveCPP(graph);
+    expect(result.oddNodes.length).toBe(4);
+    expect(result.eulerCircuit?.[0]).toBe("P74");
+    expect(result.eulerCircuit?.at(-1)).toBe("P74");
+  });
 });

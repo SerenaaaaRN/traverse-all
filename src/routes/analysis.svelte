@@ -4,6 +4,9 @@
   import { graphState } from "@lib/graphState.svelte";
   import GraphView from "@components/graph-view.svelte";
   import DegreeTable from "@components/degree-table.svelte";
+  import TourPlayer from "@components/tour-player.svelte";
+
+  let tourStep = $state(0);
 
   const graph = $derived(graphState.graph());
 
@@ -90,7 +93,11 @@
         <h3 class="mt-5 mb-2 text-sm font-semibold text-neutral-700">
           Rute postman ({cpp.eulerCircuit.length} langkah)
         </h3>
-        <details class="rounded-lg border border-neutral-200 p-3 text-xs">
+        <TourPlayer totalSteps={cpp.eulerCircuit.length} bind:step={tourStep} />
+        <p class="mt-2 text-xs text-neutral-500">
+          Simpul saat ini: <b class="text-green-700">{cpp.eulerCircuit[tourStep] ?? "-"}</b>
+        </p>
+        <details class="mt-3 rounded-lg border border-neutral-200 p-3 text-xs">
           <summary class="cursor-pointer font-medium text-blue-700">Lihat urutan lintasan</summary>
           <p class="mt-2 leading-relaxed text-neutral-600">
             {cpp.eulerCircuit.join(" → ")}
@@ -104,6 +111,6 @@
   </aside>
 
   <main class="relative min-h-0">
-    <GraphView {cpp} />
+    <GraphView {cpp} {tourStep} />
   </main>
 </div>

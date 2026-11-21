@@ -2,7 +2,7 @@ import type { PatrolNode } from "@algorithms/types";
 
 /** 73 titik tracking jalan internal Kilang Pertamina Plaju. */
 export const patrolNodes = [
-  { id: "P01", label: "", lat: -2.991494, lng: 104.827243 },
+  { id: "P01", label: "Misalkan ini a", lat: -2.991494, lng: 104.827243 },
   { id: "P02", label: "", lat: -2.991496, lng: 104.828756 },
   { id: "P03", label: "", lat: -2.991472, lng: 104.830459 },
   { id: "P04", label: "", lat: -2.991442, lng: 104.831366 },
@@ -75,4 +75,5 @@ export const patrolNodes = [
   { id: "P71", label: "", lat: -2.998843, lng: 104.830374 },
   { id: "P72", label: "", lat: -2.99774, lng: 104.828727 },
   { id: "P73", label: "", lat: -2.997772, lng: 104.830379 },
+  { id: "P74", label: "", lat: -3.006655, lng: 104.834510 }
 ] satisfies PatrolNode[];
