@@ -1,7 +1,3 @@
-/**
- * State global aplikasi (module rune). Data statis bertipe berasal dari
- * src/data/nodes.ts dan src/data/edges.ts — tanpa barrel atau runtime validator.
- */
 import type { PatrolGraph, PatrolNode } from "@algorithms/types";
 import { patrolNodes } from "@data/nodes";
 import { patrolEdges } from "@data/edges";

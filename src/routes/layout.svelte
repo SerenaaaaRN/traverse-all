@@ -2,6 +2,7 @@
   import type { Snippet } from "svelte";
   import { p, route } from "sv-router/generated";
   import GraphView from "@components/graph-view.svelte";
+  import GraphCanvas from "@components/graph-canvas.svelte";
   import { viewState } from "@lib/viewState.svelte";
 
   let { children }: { children: Snippet } = $props();
@@ -25,7 +26,9 @@
 
   const activePage = $derived(pages.find((page) => page.href === route.pathname));
   const showMap = $derived(activePage?.withMap ?? true);
-  const panelClass = $derived(activePage?.panel === "reading" ? "w-full max-w-3xl mx-auto" : "w-[380px]");
+  let panelOpen = $state(true);
+  const isReading = $derived((activePage?.panel ?? "compact") === "reading");
+  const panelWidth = $derived(isReading ? "w-full max-w-3xl mx-auto" : panelOpen ? "w-[420px]" : "w-10");
 
   $effect(() => {
     if (!viewState.tourPlaying) return;
@@ -39,7 +42,7 @@
   });
 </script>
 
-<div class="flex h-[100dvh] overflow-hidden">
+<div class="relative flex h-[100dvh] overflow-hidden">
   <aside class="flex w-16 shrink-0 flex-col items-center gap-1 border-r border-neutral-200 bg-white py-3">
     <div class="mb-3 text-lg font-black text-blue-700">K</div>
     {#each pages as item (item.href)}
@@ -68,12 +71,66 @@
   </aside>
 
   <main class={showMap ? "relative min-w-0 flex-1" : "hidden"}>
-    <GraphView visible={showMap} />
+    {#if viewState.viewMode === "graf"}
+      <GraphCanvas />
+    {:else}
+      <GraphView visible={showMap} />
+    {/if}
+    {#if showMap}
+      <div class="absolute left-1/2 top-3 z-[9999] flex -translate-x-1/2 gap-1 rounded-lg bg-white/95 p-1 text-xs shadow">
+        <button
+          type="button"
+          onclick={() => (viewState.viewMode = "peta")}
+          class="rounded px-2.5 py-1 transition {viewState.viewMode === 'peta' ? 'bg-blue-600 text-white' : 'text-neutral-600 hover:bg-neutral-100'}"
+        >Peta</button>
+        <button
+          type="button"
+          onclick={() => (viewState.viewMode = "graf")}
+          class="rounded px-2.5 py-1 transition {viewState.viewMode === 'graf' ? 'bg-blue-600 text-white' : 'text-neutral-600 hover:bg-neutral-100'}"
+        >Graf</button>
+      </div>
+    {/if}
   </main>
 
-  <aside class="shrink-0 overflow-y-auto border-l border-neutral-200 bg-white {panelClass}">
-    <div class="p-5">
-      {@render children()}
-    </div>
+  <aside
+    class="shrink-0 border-l border-neutral-200 bg-white {isReading
+      ? 'overflow-y-auto'
+      : 'overflow-hidden transition-[width] duration-200 ease-out'} {panelWidth}"
+  >
+    {#if isReading}
+      <div class="p-5">
+        {@render children()}
+      </div>
+    {:else if !panelOpen}
+      <button
+        class="flex h-full w-full flex-col items-center gap-3 bg-white pt-4 text-neutral-400 transition hover:bg-neutral-50 hover:text-neutral-700"
+        aria-label="Buka panel"
+        title="Buka panel"
+        onclick={() => (panelOpen = true)}
+      >
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+        <span class="text-[10px] tracking-[0.2em] [writing-mode:vertical-rl]">PANEL</span>
+      </button>
+    {:else}
+      <div class="h-full overflow-y-auto">
+        <div class="flex justify-end px-2 pt-2">
+          <button
+            class="flex h-7 w-7 items-center justify-center rounded-md text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-700"
+            aria-label="Tutup panel"
+            title="Tutup panel"
+            onclick={() => (panelOpen = false)}
+          >
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+        <div class="p-5 pt-1">
+          {@render children()}
+        </div>
+      </div>
+    {/if}
   </aside>
 </div>

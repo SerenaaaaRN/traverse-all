@@ -349,8 +349,15 @@ edge augmentasi.
 
 ### 3.3 Visualisasi
 
-Visualisasi memakai koordinat `lat/lng` asli hasil tracking pada peta Leaflet
-dengan tile OpenStreetMap:
+Visualisasi dapat ditampilkan dalam dua mode dari dataset yang sama:
+
+- **Peta** — koordinat `lat/lng` asli hasil tracking pada peta Leaflet dengan
+  tile OpenStreetMap, memberi konteks geografis jaringan jalan.
+- **Graf** — layout otomatis Fruchterman–Reingold yang dihitung hanya dari
+  simpul dan sisi; koordinat geografis tidak dipakai, sehingga fokusnya murni
+  pada struktur/topologi graf.
+
+Kedua mode memakai `PatrolGraph` dan hasil `solveCPP()` yang sama:
 
 - Halaman **Peta Graf** — jaringan jalan, simpul ganjil, dan titik awal `P74`.
 - Halaman **Analisis** — metrik, daftar simpul ganjil, ruas yang diulang,

@@ -4,9 +4,26 @@ import { findRouteThroughStops, type RouteResult } from "@algorithms/route";
 import { graphState } from "./graphState.svelte";
 
 class ViewState {
+  startNode = $state("P74");
+  startNodeValid = $derived(graphState.nodes.some((n) => n.id === this.startNode));
+  startNodeDraft = $state("P74");
+
+  commitStartNode(): void {
+    const value = this.startNodeDraft.trim();
+    if (value !== this.startNode) this.startNode = value;
+  }
+
+  resetStartNode(): void {
+    this.startNodeDraft = "P74";
+    this.startNode = "P74";
+  }
+
   cpp = $derived.by<CPPResult | null>(() => {
     try {
-      return solveCPP(graphState.graph());
+      return solveCPP(
+        graphState.graph(),
+        this.startNodeValid ? this.startNode : undefined,
+      );
     } catch {
       return null;
     }
@@ -16,6 +33,8 @@ class ViewState {
   tourPlaying = $state(false);
   speedMs = $state(220);
   selectedNode = $state<string | null>(null);
+
+  viewMode = $state<"peta" | "graf">("peta");
 
   stops = $state<string[]>([]);
 

@@ -19,8 +19,9 @@
   let byId = new Map<string, PatrolNode>();
   let weightLines: L.Polyline[] = [];
   let fitted = false;
+  let resizeObserver: ResizeObserver | null = null;
 
-  const START = "P74";
+  const startId = $derived(viewState.startNodeValid ? viewState.startNode : "P74");
 
   function pairKey(a: string, b: string): string {
     return a < b ? `${a}|${b}` : `${b}|${a}`;
@@ -160,7 +161,7 @@
     for (const node of graph.nodes) {
       const degree = degrees.get(node.id)?.degree ?? 0;
       const isOdd = degrees.get(node.id)?.isOdd ?? false;
-      const isStart = node.id === START;
+      const isStart = node.id === startId;
       const markOdd = isOdd && viewState.showOdd;
       const marker = L.circleMarker([node.lat, node.lng], {
         radius: isStart ? 8 : markOdd ? 6 : 4.5,
@@ -218,9 +219,7 @@
     }
 
     if (!fitted) {
-      const bounds = L.latLngBounds(
-        graph.nodes.map((n) => [n.lat, n.lng] as L.LatLngTuple),
-      );
+      const bounds = L.latLngBounds(graph.nodes.map((n) => [n.lat, n.lng] as L.LatLngTuple));
       map.fitBounds(bounds, { padding: [24, 24] });
       fitted = true;
     }
@@ -242,10 +241,18 @@
     tourLayer = L.layerGroup().addTo(map);
     visitedLayer = L.layerGroup().addTo(map);
     draw();
+    resizeObserver = new ResizeObserver(() => {
+      map?.invalidateSize();
+    });
+    resizeObserver.observe(container);
   });
 
   $effect(() => {
+    void graphState.nodes;
+    void graphState.edges;
     void viewState.cpp;
+    void viewState.startNode;
+    void viewState.startNodeValid;
     void viewState.showOdd;
     void viewState.showTour;
     void viewState.showRoute;
@@ -268,6 +275,8 @@
   });
 
   onDestroy(() => {
+    resizeObserver?.disconnect();
+    resizeObserver = null;
     map?.remove();
     map = null;
   });
@@ -277,6 +286,32 @@
   <div bind:this={container} class="h-full w-full bg-slate-100"></div>
 
   <div class="absolute right-3 top-3 z-[500] w-40 rounded-lg bg-white/95 p-3 text-xs shadow">
+    <div class="mb-3">
+      <p class="mb-1 font-semibold text-neutral-700">Titik awal</p>
+      <div class="flex gap-1">
+        <input
+          type="text"
+          bind:value={viewState.startNodeDraft}
+          onchange={() => viewState.commitStartNode()}
+          list="start-options-peta"
+          placeholder="P74"
+          class="min-w-0 flex-1 rounded border border-neutral-300 px-1.5 py-1 text-xs"
+        />
+        <button
+          type="button"
+          onclick={() => viewState.resetStartNode()}
+          class="rounded border border-neutral-300 px-1.5 py-1 text-xs text-neutral-600 hover:bg-neutral-50"
+        >Reset</button>
+      </div>
+      <datalist id="start-options-peta">
+        {#each graphState.nodes as node (node.id)}
+          <option value={node.id}></option>
+        {/each}
+      </datalist>
+      {#if !viewState.startNodeValid}
+        <p class="mt-1 text-[10px] text-amber-700">Tidak ditemukan — pakai P74</p>
+      {/if}
+    </div>
     <p class="mb-2 font-semibold text-neutral-700">Kontrol peta</p>
     <label class="flex items-center gap-2 py-0.5 text-neutral-600">
       <input type="checkbox" bind:checked={viewState.showWeights} class="accent-blue-600" />
