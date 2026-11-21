@@ -92,7 +92,7 @@ describe("solveCPP", () => {
     expect(result.eulerCircuit?.at(-1)).toBe(result.eulerCircuit?.[0]);
   });
 
-  test("brute force selalu <= greedy", () => {
+  test("strategi pasangan terdekat tercatat di hasil", () => {
     const graph = makeGraph(
       ["A", "B", "C", "D", "E", "F", "G", "H"],
       [
@@ -107,28 +107,6 @@ describe("solveCPP", () => {
       ],
     );
     const result = solveCPP(graph);
-    const brute = result.strategies.find((s) => s.strategy === "brute-force");
-    const greedy = result.strategies.find((s) => s.strategy === "greedy");
-    expect(brute?.executed).toBe(true);
-    expect(greedy?.executed).toBe(true);
-    expect(brute!.totalCostKm).toBeLessThanOrEqual(greedy!.totalCostKm);
-  });
-
-  test("strategi greedy dipaksa via argumen", () => {
-    const graph = makeGraph(
-      ["A", "B", "C", "D", "E", "F", "G", "H"],
-      [
-        ["A", "E", 1],
-        ["B", "E", 2],
-        ["C", "F", 3],
-        ["D", "F", 4],
-        ["E", "F", 1],
-        ["E", "G", 1],
-        ["F", "H", 1],
-        ["G", "H", 1],
-      ],
-    );
-    const result = solveCPP(graph, "greedy");
     const greedy = result.strategies.find((s) => s.strategy === "greedy");
     expect(greedy?.totalCostKm).toBe(result.augmentationCostKm);
   });

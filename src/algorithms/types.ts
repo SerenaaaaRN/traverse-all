@@ -1,34 +1,31 @@
-export type TransportMode = "lrt" | "brt" | "feeder" | "kereta";
-
-export interface RouteLine {
-  id: string;
-  name: string;
-  mode: TransportMode;
-  color: string;
-}
-
-export interface TransitNode {
+/** Simpul jaringan jalan internal kilang. Koordinat asli hasil tracking GMaps. */
+export interface PatrolNode {
   id: string;
   label: string;
-  x: number;
-  y: number;
-  lat?: number | null;
-  lng?: number | null;
-  type: "station" | "stop" | "terminal" | "transfer";
-  routeIds: string[];
+  lat: number;
+  lng: number;
 }
 
-export interface TransitEdge {
+/** Ruas jalan undirected dengan bobot jarak dalam kilometer. */
+export interface PatrolEdge {
   source: string;
   target: string;
   weightKm: number;
-  isOneWay: boolean;
-  routeId: string;
 }
 
-export interface TransitGraph {
-  nodes: TransitNode[];
-  edges: TransitEdge[];
+/** Informasi sumber dataset (dari metadata nodes.json). */
+export interface PatrolMetadata {
+  name: string;
+  source: string;
+  weightUnit: string;
+  coordinateNote: string;
+  graphNote: string;
+}
+
+export interface PatrolGraph {
+  nodes: PatrolNode[];
+  edges: PatrolEdge[];
+  metadata?: PatrolMetadata;
 }
 
 export interface DegreeInfo {
@@ -37,20 +34,21 @@ export interface DegreeInfo {
   isOdd: boolean;
 }
 
+/** Hasil satu strategi perfect matching pada simpul ganjil. */
 export interface MatchingStrategyResult {
-  strategy: "brute-force" | "greedy";
+  strategy: "greedy";
   pairs: Array<{ u: string; v: string; costKm: number }>;
   totalCostKm: number;
   executed: boolean;
   paths: Map<string, string[]>;
 }
 
+/** Edge yang disalin (diulang) saat augmentasi CPP. */
 export interface AugmentedEdge {
   source: string;
   target: string;
   weightKm: number;
   augmented: boolean;
-  routeId: string;
 }
 
 export interface CPPResult {

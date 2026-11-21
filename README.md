@@ -1,47 +1,96 @@
-# Svelte + TS + Vite
+# Patroli Kilang Plaju — Euler & Chinese Postman Problem
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+Studi kasus **Struktur Diskrit 2** — analisis jaringan jalan internal Kilang
+Pertamina Plaju dengan teori graf, derajat simpul, sirkuit Euler, dan Chinese
+Postman Problem (CPP).
 
-## Recommended IDE Setup
+Aplikasi web client-side ini memvisualisasikan jaringan pada peta OpenStreetMap
+serta menghitung rute patroli tertutup yang menempuh setiap ruas jalan minimal
+satu kali dengan jarak serendah mungkin.
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+## Angka kunci
 
-## Need an official Svelte framework?
+| Metrik | Nilai |
+|---|---:|
+| Simpul | 73 |
+| Ruas | 112 |
+| Total bobot | 18,645 km |
+| Komponen terhubung | 1 |
+| Cyclomatic number (μ) | 40 |
+| Simpul berderajat ganjil | 38 |
+| Biaya augmentasi | 4,259 km |
+| Total tour patroli | **22,904 km** |
+| Penghematan vs baseline | **38,58%** |
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+## Stack
 
-## Technical considerations
+- **TypeScript** — seluruh algoritma sebagai pure function
+- **Svelte 5** (runes) + `sv-router` — antarmuka dan navigasi
+- **Leaflet** + OpenStreetMap — peta jaringan
+- **Vite** + **Tailwind CSS** — build dan styling
+- **Bun** — package manager, test runner, dan dev server
 
-**Why use this over SvelteKit?**
+## Menjalankan
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
-
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
-
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
-
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
-
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+```bash
+bun install
+bun run dev        # http://localhost:5173
+bun run check      # svelte-check + tsc
+bun test           # 47 test
+bun run build      # produksi ke dist/
 ```
+
+## Struktur
+
+```text
+src/
+├── algorithms/
+│   ├── types.ts         # PatrolGraph, CPPResult, dll.
+│   ├── degrees.ts       # derajat & simpul ganjil
+│   ├── connectivity.ts  # BFS konektivitas
+│   ├── dijkstra.ts      # jarak & path terpendek
+│   ├── matching.ts      # pasangan simpul terdekat
+│   ├── euler.ts         # Hierholzer
+│   └── cpp.ts           # pipeline CPP
+├── data/
+│   ├── nodes.json       # sumber data (73 simpul, 112 ruas)
+│   └── index.ts         # loader + runtime guard
+├── lib/graphState.svelte.ts
+├── components/domain/   # GraphView (Leaflet), DegreeTable
+└── routes/              # index, analysis, comparison, theory
+```
+
+## Data
+
+`src/data/nodes.json` adalah satu-satunya sumber data. Formatnya:
+
+```jsonc
+{
+  "metadata": { "name": "...", "source": "...", "weight_unit": "meter", ... },
+  "nodes": [{ "name": "P01", "lat": -2.991494, "lng": 104.827243, "label": "" }],
+  "edges": [{ "from": "P01", "to": "P02", "distance_m": 350, "status": "..." }]
+}
+```
+
+`src/data/index.ts` mengonversi `name → id`, `from/to → source/target`, dan
+`distance_m → weightKm` (meter → kilometer). Field `status` tidak dipakai.
+
+## Algoritma
+
+1. Hitung derajat → 38 simpul ganjil ⇒ graf bukan Eulerian.
+2. Dijkstra dari setiap simpul ganjil → matriks jarak & path.
+3. Pasangan terdekat: urutkan pasangan, ambil termurah dengan ujung belum terpakai.
+4. Augmentasi: salin ruas pada path pasangan (edge paralel).
+5. Hierholzer → sirkuit Euler mulai dari `P01`.
+
+Brute force sengaja tidak dipakai: untuk 38 simpul ganjil kompleksitasnya
+O(n!!). Aturan pasangan terdekat dipilih karena sederhana dan mudah dijelaskan,
+meski tidak menjamin optimum mutlak.
+
+## Catatan
+
+- Graf dimodelkan tak berarah; bobot adalah jarak geometris antar titik
+  tracking Google Maps, bukan panjang jalan sebenarnya.
+- Tile peta OpenStreetMap memerlukan koneksi internet; layer graf tetap tampil
+  walau tile gagal dimuat.
+- Laporan lengkap ada di [`docs/Laporan.md`](docs/Laporan.md).

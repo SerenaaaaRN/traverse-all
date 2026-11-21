@@ -1,32 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import type { TransitGraph } from "@algorithms/types";
 import {
   buildDistanceMatrix,
   dijkstraShortestPath,
 } from "@algorithms/dijkstra";
-
-function makeGraph(
-  nodeIds: string[],
-  edgeDefs: Array<[string, string, number]>,
-): TransitGraph {
-  return {
-    nodes: nodeIds.map((id) => ({
-      id,
-      label: id,
-      x: 0,
-      y: 0,
-      type: "stop" as const,
-      routeIds: ["X"],
-    })),
-    edges: edgeDefs.map(([source, target, weightKm]) => ({
-      source,
-      target,
-      weightKm,
-      isOneWay: false,
-      routeId: "X",
-    })),
-  };
-}
+import { makeGraph } from "./helpers";
 
 describe("dijkstraShortestPath", () => {
   test("source sama dengan target", () => {

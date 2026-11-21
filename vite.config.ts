@@ -9,10 +9,10 @@ export default defineConfig({
   plugins: [svelte(), tailwindcss(), router()],
   resolve: {
     alias: {
-      "@algorithms": path.resolve(__dirname, "./src/algorithms"),
-      "@data": path.resolve(__dirname, "./src/data"),
-      "@ui": path.resolve(__dirname, "./src/ui"),
-      "@lib": path.resolve(__dirname, "./src/lib"),
+      "@algorithms": path.resolve(import.meta.dirname, "./src/algorithms"),
+      "@data": path.resolve(import.meta.dirname, "./src/data"),
+      "@ui": path.resolve(import.meta.dirname, "./src/ui"),
+      "@lib": path.resolve(import.meta.dirname, "./src/lib"),
     },
   },
 });

@@ -1,4 +1,4 @@
-import type { TransitGraph } from "@algorithms/types";
+import type { PatrolGraph } from "@algorithms/types";
 
 export interface ShortestPath {
   distanceKm: number;
@@ -10,8 +10,9 @@ interface QueueItem {
   dist: number;
 }
 
+/** Dijkstra dengan array sederhana */
 export function dijkstraShortestPath(
-  graph: TransitGraph,
+  graph: PatrolGraph,
   source: string,
   target: string,
 ): ShortestPath | null {
@@ -72,8 +73,9 @@ export function dijkstraShortestPath(
   return { distanceKm: finalDist, path };
 }
 
+/** Matriks jarak & path terpendek antar semua pasangan simpul yang diminta. */
 export function buildDistanceMatrix(
-  graph: TransitGraph,
+  graph: PatrolGraph,
   nodeIds: string[],
 ): Map<string, Map<string, ShortestPath>> {
   const matrix = new Map<string, Map<string, ShortestPath>>();

@@ -1,0 +1,1123 @@
+{
+  "metadata": {
+    "name": "Jaringan Jalan Internal Kilang Pertamina Plaju",
+    "source": "Google Maps tracking via data/index.html",
+    "weight_unit": "meter",
+    "coordinate_note": "Koordinat hasil tracking GMaps; bobot berupa jarak geometris antar titik tracking.",
+    "graph_note": "Graf undirected; satu edge unik per pasangan simpul."
+  },
+  "nodes": [
+    {
+      "name": "P01",
+      "lat": -2.991494,
+      "lng": 104.827243,
+      "label": ""
+    },
+    {
+      "name": "P02",
+      "lat": -2.991496,
+      "lng": 104.828756,
+      "label": ""
+    },
+    {
+      "name": "P03",
+      "lat": -2.991472,
+      "lng": 104.830459,
+      "label": ""
+    },
+    {
+      "name": "P04",
+      "lat": -2.991442,
+      "lng": 104.831366,
+      "label": ""
+    },
+    {
+      "name": "P05",
+      "lat": -2.992288,
+      "lng": 104.831361,
+      "label": ""
+    },
+    {
+      "name": "P06",
+      "lat": -2.992331,
+      "lng": 104.830427,
+      "label": ""
+    },
+    {
+      "name": "P07",
+      "lat": -2.99231,
+      "lng": 104.828759,
+      "label": ""
+    },
+    {
+      "name": "P08",
+      "lat": -2.993284,
+      "lng": 104.828753,
+      "label": ""
+    },
+    {
+      "name": "P09",
+      "lat": -2.993327,
+      "lng": 104.83039,
+      "label": ""
+    },
+    {
+      "name": "P10",
+      "lat": -2.993445,
+      "lng": 104.832712,
+      "label": ""
+    },
+    {
+      "name": "P11",
+      "lat": -2.992251,
+      "lng": 104.832702,
+      "label": ""
+    },
+    {
+      "name": "P12",
+      "lat": -2.991319,
+      "lng": 104.834,
+      "label": ""
+    },
+    {
+      "name": "P13",
+      "lat": -2.995116,
+      "lng": 104.828753,
+      "label": ""
+    },
+    {
+      "name": "P14",
+      "lat": -2.993316,
+      "lng": 104.829515,
+      "label": ""
+    },
+    {
+      "name": "P15",
+      "lat": -2.995116,
+      "lng": 104.82951,
+      "label": ""
+    },
+    {
+      "name": "P16",
+      "lat": -2.995116,
+      "lng": 104.830379,
+      "label": ""
+    },
+    {
+      "name": "P17",
+      "lat": -2.99511,
+      "lng": 104.832712,
+      "label": ""
+    },
+    {
+      "name": "P18",
+      "lat": -2.995083,
+      "lng": 104.826967,
+      "label": ""
+    },
+    {
+      "name": "P19",
+      "lat": -2.993284,
+      "lng": 104.827101,
+      "label": ""
+    },
+    {
+      "name": "P20",
+      "lat": -2.993488,
+      "lng": 104.827514,
+      "label": ""
+    },
+    {
+      "name": "P21",
+      "lat": -2.992808,
+      "lng": 104.827573,
+      "label": ""
+    },
+    {
+      "name": "P22",
+      "lat": -2.995094,
+      "lng": 104.82745,
+      "label": ""
+    },
+    {
+      "name": "P23",
+      "lat": -2.994002,
+      "lng": 104.828126,
+      "label": ""
+    },
+    {
+      "name": "P24",
+      "lat": -2.994002,
+      "lng": 104.828727,
+      "label": ""
+    },
+    {
+      "name": "P25",
+      "lat": -2.995094,
+      "lng": 104.828104,
+      "label": ""
+    },
+    {
+      "name": "P26",
+      "lat": -2.996727,
+      "lng": 104.827005,
+      "label": ""
+    },
+    {
+      "name": "P27",
+      "lat": -2.996749,
+      "lng": 104.828727,
+      "label": ""
+    },
+    {
+      "name": "P28",
+      "lat": -2.996754,
+      "lng": 104.830368,
+      "label": ""
+    },
+    {
+      "name": "P29",
+      "lat": -2.996775,
+      "lng": 104.832718,
+      "label": ""
+    },
+    {
+      "name": "P30",
+      "lat": -2.996765,
+      "lng": 104.834579,
+      "label": ""
+    },
+    {
+      "name": "P31",
+      "lat": -2.996775,
+      "lng": 104.833571,
+      "label": ""
+    },
+    {
+      "name": "P32",
+      "lat": -2.997579,
+      "lng": 104.833571,
+      "label": ""
+    },
+    {
+      "name": "P33",
+      "lat": -2.997562,
+      "lng": 104.832729,
+      "label": ""
+    },
+    {
+      "name": "P34",
+      "lat": -2.997576,
+      "lng": 104.834611,
+      "label": ""
+    },
+    {
+      "name": "P35",
+      "lat": -2.998845,
+      "lng": 104.832718,
+      "label": ""
+    },
+    {
+      "name": "P36",
+      "lat": -2.998829,
+      "lng": 104.83356,
+      "label": ""
+    },
+    {
+      "name": "P37",
+      "lat": -2.998845,
+      "lng": 104.834569,
+      "label": ""
+    },
+    {
+      "name": "P38",
+      "lat": -2.997576,
+      "lng": 104.836468,
+      "label": ""
+    },
+    {
+      "name": "P39",
+      "lat": -2.998835,
+      "lng": 104.836478,
+      "label": ""
+    },
+    {
+      "name": "P40",
+      "lat": -3.000971,
+      "lng": 104.836457,
+      "label": ""
+    },
+    {
+      "name": "P41",
+      "lat": -3.000992,
+      "lng": 104.834611,
+      "label": ""
+    },
+    {
+      "name": "P42",
+      "lat": -2.998835,
+      "lng": 104.835593,
+      "label": ""
+    },
+    {
+      "name": "P43",
+      "lat": -3.000971,
+      "lng": 104.835588,
+      "label": ""
+    },
+    {
+      "name": "P44",
+      "lat": -3.000987,
+      "lng": 104.832675,
+      "label": ""
+    },
+    {
+      "name": "P45",
+      "lat": -3.003124,
+      "lng": 104.836484,
+      "label": ""
+    },
+    {
+      "name": "P46",
+      "lat": -3.003082,
+      "lng": 104.834569,
+      "label": ""
+    },
+    {
+      "name": "P47",
+      "lat": -3.003066,
+      "lng": 104.832702,
+      "label": ""
+    },
+    {
+      "name": "P48",
+      "lat": -3.0054,
+      "lng": 104.832702,
+      "label": ""
+    },
+    {
+      "name": "P49",
+      "lat": -3.005427,
+      "lng": 104.834558,
+      "label": ""
+    },
+    {
+      "name": "P50",
+      "lat": -3.005395,
+      "lng": 104.836462,
+      "label": ""
+    },
+    {
+      "name": "P51",
+      "lat": -3.003119,
+      "lng": 104.835963,
+      "label": ""
+    },
+    {
+      "name": "P52",
+      "lat": -3.0054,
+      "lng": 104.835963,
+      "label": ""
+    },
+    {
+      "name": "P53",
+      "lat": -3.007772,
+      "lng": 104.832664,
+      "label": ""
+    },
+    {
+      "name": "P54",
+      "lat": -3.008216,
+      "lng": 104.828099,
+      "label": ""
+    },
+    {
+      "name": "P55",
+      "lat": -3.007606,
+      "lng": 104.826742,
+      "label": ""
+    },
+    {
+      "name": "P56",
+      "lat": -3.007638,
+      "lng": 104.828094,
+      "label": ""
+    },
+    {
+      "name": "P57",
+      "lat": -3.005363,
+      "lng": 104.826774,
+      "label": ""
+    },
+    {
+      "name": "P58",
+      "lat": -3.005352,
+      "lng": 104.828104,
+      "label": ""
+    },
+    {
+      "name": "P59",
+      "lat": -3.005389,
+      "lng": 104.829472,
+      "label": ""
+    },
+    {
+      "name": "P60",
+      "lat": -3.005379,
+      "lng": 104.83032,
+      "label": ""
+    },
+    {
+      "name": "P61",
+      "lat": -3.007638,
+      "lng": 104.829429,
+      "label": ""
+    },
+    {
+      "name": "P62",
+      "lat": -3.003049,
+      "lng": 104.827305,
+      "label": ""
+    },
+    {
+      "name": "P63",
+      "lat": -3.003066,
+      "lng": 104.826753,
+      "label": ""
+    },
+    {
+      "name": "P64",
+      "lat": -3.003098,
+      "lng": 104.828078,
+      "label": ""
+    },
+    {
+      "name": "P65",
+      "lat": -3.003114,
+      "lng": 104.829504,
+      "label": ""
+    },
+    {
+      "name": "P66",
+      "lat": -3.003108,
+      "lng": 104.830352,
+      "label": ""
+    },
+    {
+      "name": "P67",
+      "lat": -3.003073,
+      "lng": 104.828716,
+      "label": ""
+    },
+    {
+      "name": "P68",
+      "lat": -3.000953,
+      "lng": 104.828721,
+      "label": ""
+    },
+    {
+      "name": "P69",
+      "lat": -3.000974,
+      "lng": 104.830357,
+      "label": ""
+    },
+    {
+      "name": "P70",
+      "lat": -2.998827,
+      "lng": 104.828727,
+      "label": ""
+    },
+    {
+      "name": "P71",
+      "lat": -2.998843,
+      "lng": 104.830374,
+      "label": ""
+    },
+    {
+      "name": "P72",
+      "lat": -2.99774,
+      "lng": 104.828727,
+      "label": ""
+    },
+    {
+      "name": "P73",
+      "lat": -2.997772,
+      "lng": 104.830379,
+      "label": ""
+    }
+  ],
+  "edges": [
+    {
+      "from": "P01",
+      "to": "P02",
+      "distance_m": 350,
+      "status": ""
+    },
+    {
+      "from": "P01",
+      "to": "P19",
+      "distance_m": 210,
+      "status": ""
+    },
+    {
+      "from": "P02",
+      "to": "P03",
+      "distance_m": 189,
+      "status": ""
+    },
+    {
+      "from": "P03",
+      "to": "P04",
+      "distance_m": 101,
+      "status": ""
+    },
+    {
+      "from": "P04",
+      "to": "P12",
+      "distance_m": 293,
+      "status": ""
+    },
+    {
+      "from": "P04",
+      "to": "P05",
+      "distance_m": 94,
+      "status": ""
+    },
+    {
+      "from": "P02",
+      "to": "P07",
+      "distance_m": 91,
+      "status": ""
+    },
+    {
+      "from": "P07",
+      "to": "P06",
+      "distance_m": 185,
+      "status": ""
+    },
+    {
+      "from": "P06",
+      "to": "P03",
+      "distance_m": 96,
+      "status": ""
+    },
+    {
+      "from": "P06",
+      "to": "P05",
+      "distance_m": 104,
+      "status": ""
+    },
+    {
+      "from": "P05",
+      "to": "P11",
+      "distance_m": 149,
+      "status": ""
+    },
+    {
+      "from": "P07",
+      "to": "P08",
+      "distance_m": 108,
+      "status": ""
+    },
+    {
+      "from": "P19",
+      "to": "P20",
+      "distance_m": 51,
+      "status": ""
+    },
+    {
+      "from": "P20",
+      "to": "P21",
+      "distance_m": 76,
+      "status": ""
+    },
+    {
+      "from": "P18",
+      "to": "P19",
+      "distance_m": 201,
+      "status": ""
+    },
+    {
+      "from": "P18",
+      "to": "P22",
+      "distance_m": 54,
+      "status": ""
+    },
+    {
+      "from": "P20",
+      "to": "P22",
+      "distance_m": 179,
+      "status": ""
+    },
+    {
+      "from": "P11",
+      "to": "P10",
+      "distance_m": 133,
+      "status": ""
+    },
+    {
+      "from": "P08",
+      "to": "P14",
+      "distance_m": 85,
+      "status": ""
+    },
+    {
+      "from": "P14",
+      "to": "P09",
+      "distance_m": 97,
+      "status": ""
+    },
+    {
+      "from": "P09",
+      "to": "P10",
+      "distance_m": 258,
+      "status": ""
+    },
+    {
+      "from": "P10",
+      "to": "P17",
+      "distance_m": 185,
+      "status": ""
+    },
+    {
+      "from": "P17",
+      "to": "P16",
+      "distance_m": 259,
+      "status": ""
+    },
+    {
+      "from": "P16",
+      "to": "P15",
+      "distance_m": 96,
+      "status": ""
+    },
+    {
+      "from": "P14",
+      "to": "P15",
+      "distance_m": 200,
+      "status": ""
+    },
+    {
+      "from": "P08",
+      "to": "P24",
+      "distance_m": 80,
+      "status": ""
+    },
+    {
+      "from": "P24",
+      "to": "P13",
+      "distance_m": 124,
+      "status": ""
+    },
+    {
+      "from": "P24",
+      "to": "P23",
+      "distance_m": 67,
+      "status": ""
+    },
+    {
+      "from": "P23",
+      "to": "P25",
+      "distance_m": 121,
+      "status": ""
+    },
+    {
+      "from": "P22",
+      "to": "P25",
+      "distance_m": 73,
+      "status": ""
+    },
+    {
+      "from": "P25",
+      "to": "P13",
+      "distance_m": 72,
+      "status": ""
+    },
+    {
+      "from": "P13",
+      "to": "P15",
+      "distance_m": 84,
+      "status": ""
+    },
+    {
+      "from": "P06",
+      "to": "P09",
+      "distance_m": 111,
+      "status": ""
+    },
+    {
+      "from": "P09",
+      "to": "P16",
+      "distance_m": 199,
+      "status": ""
+    },
+    {
+      "from": "P18",
+      "to": "P26",
+      "distance_m": 183,
+      "status": ""
+    },
+    {
+      "from": "P13",
+      "to": "P27",
+      "distance_m": 182,
+      "status": ""
+    },
+    {
+      "from": "P16",
+      "to": "P28",
+      "distance_m": 182,
+      "status": ""
+    },
+    {
+      "from": "P17",
+      "to": "P29",
+      "distance_m": 185,
+      "status": ""
+    },
+    {
+      "from": "P26",
+      "to": "P27",
+      "distance_m": 191,
+      "status": ""
+    },
+    {
+      "from": "P27",
+      "to": "P28",
+      "distance_m": 182,
+      "status": ""
+    },
+    {
+      "from": "P28",
+      "to": "P29",
+      "distance_m": 261,
+      "status": ""
+    },
+    {
+      "from": "P27",
+      "to": "P72",
+      "distance_m": 110,
+      "status": ""
+    },
+    {
+      "from": "P28",
+      "to": "P73",
+      "distance_m": 113,
+      "status": ""
+    },
+    {
+      "from": "P29",
+      "to": "P31",
+      "distance_m": 95,
+      "status": ""
+    },
+    {
+      "from": "P31",
+      "to": "P30",
+      "distance_m": 112,
+      "status": ""
+    },
+    {
+      "from": "P29",
+      "to": "P33",
+      "distance_m": 88,
+      "status": ""
+    },
+    {
+      "from": "P31",
+      "to": "P32",
+      "distance_m": 89,
+      "status": ""
+    },
+    {
+      "from": "P30",
+      "to": "P34",
+      "distance_m": 90,
+      "status": ""
+    },
+    {
+      "from": "P34",
+      "to": "P32",
+      "distance_m": 115,
+      "status": ""
+    },
+    {
+      "from": "P32",
+      "to": "P33",
+      "distance_m": 94,
+      "status": ""
+    },
+    {
+      "from": "P73",
+      "to": "P72",
+      "distance_m": 183,
+      "status": ""
+    },
+    {
+      "from": "P72",
+      "to": "P70",
+      "distance_m": 121,
+      "status": ""
+    },
+    {
+      "from": "P73",
+      "to": "P71",
+      "distance_m": 119,
+      "status": ""
+    },
+    {
+      "from": "P35",
+      "to": "P33",
+      "distance_m": 143,
+      "status": ""
+    },
+    {
+      "from": "P32",
+      "to": "P36",
+      "distance_m": 139,
+      "status": ""
+    },
+    {
+      "from": "P34",
+      "to": "P37",
+      "distance_m": 141,
+      "status": ""
+    },
+    {
+      "from": "P34",
+      "to": "P38",
+      "distance_m": 206,
+      "status": ""
+    },
+    {
+      "from": "P38",
+      "to": "P39",
+      "distance_m": 140,
+      "status": ""
+    },
+    {
+      "from": "P39",
+      "to": "P42",
+      "distance_m": 98,
+      "status": ""
+    },
+    {
+      "from": "P42",
+      "to": "P37",
+      "distance_m": 114,
+      "status": ""
+    },
+    {
+      "from": "P37",
+      "to": "P36",
+      "distance_m": 112,
+      "status": ""
+    },
+    {
+      "from": "P36",
+      "to": "P35",
+      "distance_m": 94,
+      "status": ""
+    },
+    {
+      "from": "P35",
+      "to": "P71",
+      "distance_m": 260,
+      "status": ""
+    },
+    {
+      "from": "P71",
+      "to": "P70",
+      "distance_m": 183,
+      "status": ""
+    },
+    {
+      "from": "P70",
+      "to": "P68",
+      "distance_m": 236,
+      "status": ""
+    },
+    {
+      "from": "P69",
+      "to": "P71",
+      "distance_m": 237,
+      "status": ""
+    },
+    {
+      "from": "P35",
+      "to": "P44",
+      "distance_m": 238,
+      "status": ""
+    },
+    {
+      "from": "P37",
+      "to": "P41",
+      "distance_m": 239,
+      "status": ""
+    },
+    {
+      "from": "P42",
+      "to": "P43",
+      "distance_m": 238,
+      "status": ""
+    },
+    {
+      "from": "P39",
+      "to": "P40",
+      "distance_m": 238,
+      "status": ""
+    },
+    {
+      "from": "P40",
+      "to": "P43",
+      "distance_m": 96,
+      "status": ""
+    },
+    {
+      "from": "P43",
+      "to": "P41",
+      "distance_m": 109,
+      "status": ""
+    },
+    {
+      "from": "P41",
+      "to": "P44",
+      "distance_m": 215,
+      "status": ""
+    },
+    {
+      "from": "P44",
+      "to": "P69",
+      "distance_m": 257,
+      "status": ""
+    },
+    {
+      "from": "P69",
+      "to": "P68",
+      "distance_m": 182,
+      "status": ""
+    },
+    {
+      "from": "P68",
+      "to": "P67",
+      "distance_m": 236,
+      "status": ""
+    },
+    {
+      "from": "P69",
+      "to": "P66",
+      "distance_m": 237,
+      "status": ""
+    },
+    {
+      "from": "P44",
+      "to": "P47",
+      "distance_m": 231,
+      "status": ""
+    },
+    {
+      "from": "P41",
+      "to": "P46",
+      "distance_m": 232,
+      "status": ""
+    },
+    {
+      "from": "P40",
+      "to": "P45",
+      "distance_m": 239,
+      "status": ""
+    },
+    {
+      "from": "P51",
+      "to": "P45",
+      "distance_m": 58,
+      "status": ""
+    },
+    {
+      "from": "P51",
+      "to": "P46",
+      "distance_m": 155,
+      "status": ""
+    },
+    {
+      "from": "P46",
+      "to": "P47",
+      "distance_m": 207,
+      "status": ""
+    },
+    {
+      "from": "P47",
+      "to": "P66",
+      "distance_m": 261,
+      "status": ""
+    },
+    {
+      "from": "P66",
+      "to": "P65",
+      "distance_m": 94,
+      "status": ""
+    },
+    {
+      "from": "P65",
+      "to": "P67",
+      "distance_m": 88,
+      "status": ""
+    },
+    {
+      "from": "P67",
+      "to": "P64",
+      "distance_m": 71,
+      "status": ""
+    },
+    {
+      "from": "P64",
+      "to": "P62",
+      "distance_m": 86,
+      "status": ""
+    },
+    {
+      "from": "P62",
+      "to": "P63",
+      "distance_m": 61,
+      "status": ""
+    },
+    {
+      "from": "P63",
+      "to": "P57",
+      "distance_m": 255,
+      "status": ""
+    },
+    {
+      "from": "P58",
+      "to": "P64",
+      "distance_m": 251,
+      "status": ""
+    },
+    {
+      "from": "P65",
+      "to": "P59",
+      "distance_m": 253,
+      "status": ""
+    },
+    {
+      "from": "P66",
+      "to": "P60",
+      "distance_m": 253,
+      "status": ""
+    },
+    {
+      "from": "P47",
+      "to": "P48",
+      "distance_m": 260,
+      "status": ""
+    },
+    {
+      "from": "P46",
+      "to": "P49",
+      "distance_m": 261,
+      "status": ""
+    },
+    {
+      "from": "P51",
+      "to": "P52",
+      "distance_m": 254,
+      "status": ""
+    },
+    {
+      "from": "P45",
+      "to": "P50",
+      "distance_m": 253,
+      "status": ""
+    },
+    {
+      "from": "P50",
+      "to": "P52",
+      "distance_m": 55,
+      "status": ""
+    },
+    {
+      "from": "P52",
+      "to": "P49",
+      "distance_m": 156,
+      "status": ""
+    },
+    {
+      "from": "P49",
+      "to": "P48",
+      "distance_m": 206,
+      "status": ""
+    },
+    {
+      "from": "P48",
+      "to": "P60",
+      "distance_m": 265,
+      "status": ""
+    },
+    {
+      "from": "P60",
+      "to": "P59",
+      "distance_m": 94,
+      "status": ""
+    },
+    {
+      "from": "P59",
+      "to": "P58",
+      "distance_m": 152,
+      "status": ""
+    },
+    {
+      "from": "P58",
+      "to": "P57",
+      "distance_m": 148,
+      "status": ""
+    },
+    {
+      "from": "P57",
+      "to": "P55",
+      "distance_m": 249,
+      "status": ""
+    },
+    {
+      "from": "P58",
+      "to": "P56",
+      "distance_m": 254,
+      "status": ""
+    },
+    {
+      "from": "P61",
+      "to": "P59",
+      "distance_m": 250,
+      "status": ""
+    },
+    {
+      "from": "P55",
+      "to": "P56",
+      "distance_m": 150,
+      "status": ""
+    },
+    {
+      "from": "P61",
+      "to": "P56",
+      "distance_m": 148,
+      "status": ""
+    },
+    {
+      "from": "P56",
+      "to": "P54",
+      "distance_m": 64,
+      "status": ""
+    },
+    {
+      "from": "P54",
+      "to": "P53",
+      "distance_m": 509,
+      "status": ""
+    },
+    {
+      "from": "P53",
+      "to": "P48",
+      "distance_m": 264,
+      "status": ""
+    }
+  ]
+}

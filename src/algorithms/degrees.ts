@@ -1,6 +1,7 @@
-import type { TransitGraph, DegreeInfo } from "@algorithms/types";
+import type { PatrolGraph, DegreeInfo } from "@algorithms/types";
 
-export function calculateDegrees(graph: TransitGraph): Map<string, DegreeInfo> {
+/** Derajat simpul untuk graf undirected (setiap edge menyumbang ke dua ujung). */
+export function calculateDegrees(graph: PatrolGraph): Map<string, DegreeInfo> {
   const counts = new Map<string, number>();
   for (const node of graph.nodes) counts.set(node.id, 0);
 
@@ -20,7 +21,7 @@ export function calculateDegrees(graph: TransitGraph): Map<string, DegreeInfo> {
   return result;
 }
 
-export function findOddNodes(graph: TransitGraph): string[] {
+export function findOddNodes(graph: PatrolGraph): string[] {
   const degrees = calculateDegrees(graph);
   return Array.from(degrees.values())
     .filter((d) => d.isOdd)

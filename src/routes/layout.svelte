@@ -14,7 +14,7 @@
 
 <div class="flex h-[100dvh] flex-col">
 	<nav class="flex h-12 shrink-0 items-center gap-1 border-b bg-white px-4">
-		<span class="mr-4 text-sm font-bold text-neutral-900">Transmusi Euler & CPP</span>
+		<span class="mr-4 text-sm font-bold text-neutral-900">Patroli Kilang Plaju — Euler &amp; CPP</span>
 		{#each navItems as item (item.href)}
 			<a
 				href={item.href}

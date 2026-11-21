@@ -1,11 +1,11 @@
-import type { TransitGraph } from "@algorithms/types";
+import type { PatrolGraph } from "@algorithms/types";
 
 /**
  * Mengecek apakah bagian non-terisolasi dari graf undirected bersifat
  * connected, mengikuti konvensi NetworkX: node berderajat 0 diabaikan,
  * sisanya harus saling terjangkau. Kompleksitas O(V + M) via BFS.
  */
-export function isConnected(graph: TransitGraph): boolean {
+export function isConnected(graph: PatrolGraph): boolean {
   const adjacency = new Map<string, string[]>();
   for (const node of graph.nodes) adjacency.set(node.id, []);
   for (const edge of graph.edges) {

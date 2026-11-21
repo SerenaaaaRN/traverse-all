@@ -1,185 +1,143 @@
 <script lang="ts">
-	import { onMount, onDestroy } from "svelte";
-	import cytoscape from "cytoscape";
-	import type { TransitGraph, TransitNode } from "@algorithms/types";
-	import { calculateDegrees } from "@algorithms/degrees";
-	import { routeById } from "@data/routes";
-	import { graphState } from "@lib/graphState.svelte";
+  import { onMount, onDestroy } from "svelte";
+  import * as L from "leaflet";
+  import "leaflet/dist/leaflet.css";
+  import type { CPPResult } from "@algorithms/types";
+  import { calculateDegrees } from "@algorithms/degrees";
+  import { graphState } from "@lib/graphState.svelte";
 
-	let cy: cytoscape.Core | null = null;
-	let container: HTMLDivElement | null = null;
-	let degreesMap = new Map<string, number>();
+  let {
+    cpp = null,
+    showTour = true,
+  }: { cpp?: CPPResult | null; showTour?: boolean } = $props();
 
-	let selectedNode = $state<{
-		id: string;
-		label: string;
-		type: TransitNode["type"];
-		degree: number;
-		routeIds: string[];
-	} | null>(null);
+  let container: HTMLDivElement | null = null;
+  let map: L.Map | null = null;
+  let networkLayer: L.LayerGroup | null = null;
+  let augmentLayer: L.LayerGroup | null = null;
+  let tourLayer: L.LayerGroup | null = null;
 
-	function buildElements(graph: TransitGraph): cytoscape.ElementDefinition[] {
-		const degrees = calculateDegrees(graph);
-		degreesMap = new Map(
-			Array.from(degrees.values()).map((d) => [d.nodeId, d.degree]),
-		);
-		const elements: cytoscape.ElementDefinition[] = [];
+  const START = "P01";
 
-		for (const node of graph.nodes) {
-			elements.push({
-				group: "nodes",
-				data: {
-					id: node.id,
-					label: node.label,
-					degree: degrees.get(node.id)?.degree ?? 0,
-					isOdd: degrees.get(node.id)?.isOdd ?? false,
-					nodeType: node.type,
-				},
-				position: { x: node.x, y: node.y },
-			});
-		}
+  function pairKey(a: string, b: string): string {
+    return a < b ? `${a}|${b}` : `${b}|${a}`;
+  }
 
-		for (const edge of graph.edges) {
-			elements.push({
-				group: "edges",
-				data: {
-					id: `${edge.source}|${edge.target}`,
-					source: edge.source,
-					target: edge.target,
-					weightKm: edge.weightKm,
-					routeId: edge.routeId,
-				},
-			});
-		}
+  function draw(): void {
+    if (!map) return;
+    networkLayer?.clearLayers();
+    augmentLayer?.clearLayers();
+    tourLayer?.clearLayers();
 
-		return elements;
-	}
+    const graph = graphState.graph();
+    const degrees = calculateDegrees(graph);
+    const byId = new Map(graph.nodes.map((n) => [n.id, n]));
+    const latlng = (id: string): L.LatLngExpression | null => {
+      const node = byId.get(id);
+      return node ? [node.lat, node.lng] : null;
+    };
 
-	function buildStyle(): cytoscape.StylesheetJson {
-		return [
-			{
-				selector: "node",
-				style: {
-					width: 14,
-					height: 14,
-					"background-color": "#60a5fa",
-					"border-width": 2,
-					"border-color": "#1e3a8a",
-					label: "data(label)",
-					"font-size": 9,
-					color: "#374151",
-					"text-valign": "bottom",
-					"text-margin-y": 6,
-				},
-			},
-			{
-				selector: "node[isOdd]",
-				style: {
-					width: 18,
-					height: 18,
-					"background-color": "#ef4444",
-					"border-color": "#991b1b",
-				},
-			},
-			{
-				selector: "node[nodeType = 'station'], node[nodeType = 'terminal']",
-				style: {
-					shape: "round-rectangle",
-					width: 20,
-					height: 16,
-				},
-			},
-			{
-				selector: "edge",
-				style: {
-					width: 4,
-					"curve-style": "straight",
-					"line-color": "#9ca3af",
-					opacity: 0.85,
-				},
-			},
-			{
-				selector: "edge[routeId]",
-				style: {
-					"line-color": "#9ca3af",
-				},
-			},
-		];
-	}
+    // Ruas dasar.
+    for (const edge of graph.edges) {
+      const a = latlng(edge.source);
+      const b = latlng(edge.target);
+      if (!a || !b) continue;
+      L.polyline([a, b], {
+        color: "#64748b",
+        weight: 2,
+        opacity: 0.65,
+      }).addTo(networkLayer!);
+    }
 
-	function colorEdges(): void {
-		if (!cy) return;
-		cy.edges().forEach((edge) => {
-			const routeId = edge.data("routeId") as string;
-			const color = routeById.get(routeId)?.color ?? "#9ca3af";
-			edge.style({ "line-color": color });
-		});
-	}
+    // Simpul: ganjil merah, titik awal hijau, sisanya biru.
+    for (const node of graph.nodes) {
+      const degree = degrees.get(node.id)?.degree ?? 0;
+      const isOdd = degrees.get(node.id)?.isOdd ?? false;
+      const isStart = node.id === START;
+      const marker = L.circleMarker([node.lat, node.lng], {
+        radius: isStart ? 8 : isOdd ? 6 : 4.5,
+        color: isStart ? "#14532d" : isOdd ? "#7f1d1d" : "#1e40af",
+        weight: 1.5,
+        fillColor: isStart ? "#16a34a" : isOdd ? "#dc2626" : "#3b82f6",
+        fillOpacity: 1,
+      });
+      marker.bindPopup(
+        `<b>${node.id}</b>${node.label ? ` — ${node.label}` : ""}<br>` +
+          `Derajat: ${degree} ${isOdd ? "(ganjil)" : "(genap)"}<br>` +
+          `Lat: ${node.lat.toFixed(6)}, Lng: ${node.lng.toFixed(6)}`,
+      );
+      marker.addTo(networkLayer!);
+    }
 
-	onMount(() => {
-		if (!container) return;
-		cy = cytoscape({
-			container,
-			elements: buildElements(graphState.filteredGraph()),
-			style: buildStyle(),
-			layout: { name: "preset", fit: true, padding: 40 },
-			minZoom: 0.3,
-			maxZoom: 3,
-		});
-		colorEdges();
-		cy.on("tap", "node", (event) => {
-			const id = event.target.id() as string;
-			const node = graphState.nodeById(id);
-			if (!node) return;
-			selectedNode = {
-				id,
-				label: node.label,
-				type: node.type,
-				degree: degreesMap.get(id) ?? 0,
-				routeIds: [...node.routeIds],
-			};
-		});
-		cy.on("tap", (event) => {
-			if (event.target === cy) selectedNode = null;
-		});
-	});
+    if (cpp) {
+      // Ruas yang diulang (augmentasi) — merah putus-putus.
+      for (const edge of cpp.augmentedEdges) {
+        const a = latlng(edge.source);
+        const b = latlng(edge.target);
+        if (!a || !b) continue;
+        L.polyline([a, b], {
+          color: "#dc2626",
+          weight: 3,
+          opacity: 0.9,
+          dashArray: "6 6",
+        }).addTo(augmentLayer!);
+      }
 
-	$effect(() => {
-		const graph = graphState.filteredGraph();
-		const cyInstance = cy;
-		if (!cyInstance) return;
-		cyInstance.batch(() => {
-			cyInstance.remove(cyInstance.elements());
-			cyInstance.add(buildElements(graph));
-		});
-		colorEdges();
-		cyInstance.fit(undefined, 40);
-	});
+      // Rute patroli lengkap.
+      if (showTour && cpp.eulerCircuit) {
+        const path = cpp.eulerCircuit
+          .map((id) => latlng(id))
+          .filter((p): p is L.LatLngExpression => p !== null);
+        if (path.length > 1) {
+          L.polyline(path, {
+            color: "#1d4ed8",
+            weight: 2,
+            opacity: 0.4,
+          }).addTo(tourLayer!);
+        }
+      }
+    }
 
-	onDestroy(() => {
-		cy?.destroy();
-		cy = null;
-	});
+    const bounds = L.latLngBounds(
+      graph.nodes.map((n) => [n.lat, n.lng] as L.LatLngTuple),
+    );
+    map.fitBounds(bounds, { padding: [24, 24] });
+  }
+
+  onMount(() => {
+    if (!container) return;
+    map = L.map(container, { zoomControl: true, preferCanvas: true });
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map);
+    networkLayer = L.layerGroup().addTo(map);
+    augmentLayer = L.layerGroup().addTo(map);
+    tourLayer = L.layerGroup().addTo(map);
+    draw();
+  });
+
+  $effect(() => {
+    // Melacak perubahan prop agar peta ikut diperbarui.
+    void cpp;
+    void showTour;
+    if (map) draw();
+  });
+
+  onDestroy(() => {
+    map?.remove();
+    map = null;
+  });
 </script>
 
 <div class="relative h-full w-full">
-	<div bind:this={container} class="h-full w-full bg-white"></div>
-
-{#if selectedNode}
-	<div class="absolute top-3 right-3 z-10 w-56 rounded-lg bg-white/95 p-3 text-xs shadow">
-		<div class="flex items-start justify-between">
-			<b class="text-sm">{selectedNode.label}</b>
-			<button
-				type="button"
-				class="text-neutral-400 hover:text-neutral-700"
-				onclick={() => (selectedNode = null)}>×</button
-			>
-		</div>
-		<p class="mt-1 text-neutral-600">
-			{selectedNode.type} · derajat <b>{selectedNode.degree}</b>
-			{selectedNode.degree % 2 !== 0 ? "(ganjil)" : "(genap)"}
-		</p>
-		<p class="mt-1 text-neutral-500">{selectedNode.routeIds.join(", ")}</p>
-	</div>
-{/if}
+  <div bind:this={container} class="h-full w-full bg-slate-100"></div>
+  {#if cpp}
+    <div class="absolute bottom-3 left-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs shadow">
+      <span class="inline-block h-2 w-4 rounded-sm bg-slate-500 align-middle"></span> ruas asli
+      <span class="ml-3 inline-block h-0.5 w-4 border-t-2 border-dashed border-red-600 align-middle"></span> ruas diulang
+      <span class="ml-3 inline-block h-2 w-4 rounded-sm bg-blue-700 align-middle"></span> rute patroli
+    </div>
+  {/if}
 </div>
