@@ -190,17 +190,6 @@ $$
 9. **Visualisasi:** peta Leaflet berbasis OpenStreetMap dan tabel derajat pada
    antarmuka Svelte.
 
-### 2.5 Metodologi Penelitian
-
-1. **Pengumpulan data:** tracking titik jalan internal kilang pada Google Maps.
-2. **Pembersihan data:** menghapus edge duplikat `P01–P19`, menyeragamkan
-   schema, dan memvalidasi endpoint.
-3. **Pemodelan graf:** membangun graf berbobot dalam TypeScript (`PatrolGraph`).
-4. **Komputasi:** menjalankan audit, pasangan simpul ganjil, augmentasi, dan
-   Euler circuit menggunakan fungsi murni TypeScript.
-5. **Verifikasi:** memeriksa sanity check biaya dan validitas sirkuit Euler.
-6. **Pelaporan:** menyajikan tabel, peta, dan pembahasan.
-
 ---
 
 ## BAB 3 Perhitungan, Penyelesaian Algoritma, Visualisasi, Implementasi Program, dan Pembahasan
@@ -447,18 +436,6 @@ Untuk $V = 74$, $E = 115$, dan $k = 40$, seluruh komputasi berjalan cepat.
 Pendekatan ini sengaja dipilih karena dapat dijelaskan dengan sederhana dan
 tidak memerlukan algoritma matching yang kompleks.
 
-#### 3.5.3 Keterbatasan
-
-1. Bobot adalah jarak geometris antar titik tracking, bukan panjang jalan
-   sebenarnya.
-2. Graf tidak membedakan edge satu arah.
-3. Data hanya mencakup ruas yang di-tracking.
-4. Edge `P01–P02` = 350 m perlu diverifikasi ulang karena jarak garis lurusnya
-   sekitar 168 m.
-5. Label lokasi simpul belum diisi; laporan memakai kode `P01`–`P74`.
-6. Titik awal patroli adalah `P74` (gerbang); jika pos keamanan berada di titik
-   lain, tour dapat dimulai dari simpul tersebut tanpa mengubah total biaya.
-
 ---
 
 ## BAB 4 Kesimpulan dan Saran
@@ -481,14 +458,7 @@ tidak memerlukan algoritma matching yang kompleks.
 
 ### 4.2 Saran
 
-1. Verifikasi ulang bobot edge, terutama `P01–P02`, menggunakan pengukuran
-   jalan yang lebih akurat.
-2. Isi `label` untuk setiap simpul agar laporan dan peta lebih mudah dipahami.
-3. Tambahkan atribut arah jalan jika ada ruas satu arah.
-4. Sesuaikan titik awal tour dengan pos keamanan yang sebenarnya.
-5. Bandingkan hasil dengan metode lain, misalnya genetik algoritma atau
-   pencarian rute berbasis waktu, untuk melihat trade-off jarak dan waktu.
-6. Perluas data jika ada ruas jalan internal yang belum ter-tracking.
+
 
 ---
 
