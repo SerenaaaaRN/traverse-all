@@ -4,11 +4,11 @@
 
   let {
     graph,
-    selectedId = null,
+    selectedIds = [],
     onSelect,
   }: {
     graph: PatrolGraph;
-    selectedId?: string | null;
+    selectedIds?: string[];
     onSelect?: (id: string) => void;
   } = $props();
 
@@ -35,8 +35,9 @@
     </thead>
     <tbody>
       {#each rows as row (row.node.id)}
+        {@const selected = selectedIds.includes(row.node.id)}
         <tr
-          class="cursor-pointer border-t border-neutral-100 {row.node.id === selectedId
+          class="cursor-pointer border-t border-neutral-100 {selected
             ? 'bg-green-50'
             : row.isOdd
               ? 'bg-red-50'
@@ -45,6 +46,7 @@
         >
           <td class="px-3 py-1.5 font-medium text-neutral-800">
             {row.node.id}
+            {#if selected}<span class="ml-1 text-green-700">✓</span>{/if}
             {#if row.isOdd}
               <span class="ml-1 rounded bg-red-600 px-1 py-0.5 text-[10px] font-semibold text-white">GANJIL</span>
             {/if}

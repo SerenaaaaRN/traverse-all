@@ -25,11 +25,6 @@ berbobot, khususnya analisis derajat simpul dan Chinese Postman Problem (CPP),
 untuk membentuk rute patroli tertutup yang menempuh setiap ruas jalan minimal
 satu kali dengan total jarak seminimal mungkin.
 
-Objek yang digunakan adalah jaringan jalan internal Kilang Pertamina Plaju
-hasil tracking Google Maps. Data tersebut membentuk graf dengan banyak siklus
-(`μ = 42`), sehingga CPP dapat digunakan secara bermakna dan tidak terjebak
-pada kasus pohon.
-
 ### 1.2 Rumusan Masalah
 
 1. Bagaimana memodelkan jaringan jalan internal Kilang Pertamina Plaju sebagai
@@ -412,7 +407,7 @@ Rute hasil pasangan terdekat menghemat 14,510 km dibanding baseline. Strategi
 ini tidak menjamin biaya minimum mutlak, tetapi mudah dijelaskan dan cukup
 efektif untuk kasus ini.
 
-Pengujian otomatis terdiri dari 50 test dalam 6 file:
+Pengujian otomatis terdiri dari 63 test dalam 6 file:
 
 1. Derajat simpul dan identifikasi simpul ganjil (`degrees.test.ts`).
 2. Dijkstra dan matriks jarak terpendek (`dijkstra.test.ts`).

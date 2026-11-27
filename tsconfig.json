@@ -9,7 +9,6 @@
     "paths": {
       "@algorithms/*": ["./src/algorithms/*"],
       "@data/*": ["./src/data/*"],
-      "@ui/*": ["./src/ui/*"],
       "@lib/*": ["./src/lib/*"],
       "@components/*": ["./src/components/*"],
       "sv-router/generated": ["./.router/router.ts"],

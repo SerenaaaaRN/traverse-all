@@ -17,10 +17,10 @@
 
   const pages: Page[] = [
     { href: p("/"), key: "peta", label: "Peta", withMap: true, panel: "compact" },
+    { href: p("/nodes"), key: "subgraf", label: "Subgraf", withMap: true, panel: "compact" },
     { href: p("/analysis"), key: "analisis", label: "Analisis", withMap: true, panel: "compact" },
     { href: p("/route"), key: "rute", label: "Rute", withMap: true, panel: "compact" },
     { href: p("/comparison"), key: "banding", label: "Banding", withMap: true, panel: "compact" },
-    { href: p("/nodes"), key: "simpul", label: "Simpul", withMap: true, panel: "compact" },
     { href: p("/theory"), key: "teori", label: "Teori", withMap: false, panel: "reading" },
   ];
 
@@ -59,8 +59,8 @@
             <circle cx="5" cy="18" r="2" /><circle cx="19" cy="6" r="2" /><path d="M7 18h5a3 3 0 003-3V8" />
           {:else if item.key === "banding"}
             <path d="M4 4h7v16H4zM13 4h7v16h-7z" />
-          {:else if item.key === "simpul"}
-            <path d="M3 5h18v14H3zM3 10h18M9 5v14" />
+          {:else if item.key === "subgraf"}
+            <circle cx="5" cy="12" r="2" /><circle cx="19" cy="5" r="2" /><circle cx="19" cy="19" r="2" /><path d="M6.7 11.2L17.3 5.8M6.7 12.8l10.6 5.4" />
           {:else}
             <path d="M4 5a2 2 0 012-2h13v18H6a2 2 0 01-2-2zM19 3h1v18h-1" />
           {/if}

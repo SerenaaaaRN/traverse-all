@@ -15,7 +15,6 @@
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@tsconfig/svelte": "^5.0.8",
     "@types/bun": "^1.4.4",
-    "@types/cytoscape": "^3.31.0",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^24.19.2",
     "svelte": "^5.57.3",
@@ -25,7 +24,6 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",
-    "cytoscape": "^3.35.0",
     "leaflet": "^1.9.4",
     "sv-router": "^0.19.0",
     "tailwindcss": "^4.3.5"

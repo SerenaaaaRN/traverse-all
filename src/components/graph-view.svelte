@@ -22,7 +22,7 @@
   let routeLayer: L.LayerGroup | null = null;
   let byId = new Map<string, PatrolNode>();
   let weightLines: L.Polyline[] = [];
-  let fitted = false;
+  let fittedKey = "";
   let resizeObserver: ResizeObserver | null = null;
 
   const startId = $derived(viewState.startNodeValid ? viewState.startNode : "P74");
@@ -136,7 +136,7 @@
     routeLayer?.clearLayers();
     weightLines = [];
 
-    const graph = graphState.graph();
+    const graph = viewState.subgraphActive ? viewState.subgraph : graphState.graph();
     const degrees = calculateDegrees(graph);
     byId = new Map(graph.nodes.map((n) => [n.id, n]));
     const cpp = viewState.cpp;
@@ -161,7 +161,7 @@
     for (const node of graph.nodes) {
       const degree = degrees.get(node.id)?.degree ?? 0;
       const isOdd = degrees.get(node.id)?.isOdd ?? false;
-      const isStart = node.id === startId;
+      const isStart = !viewState.subgraphActive && node.id === startId;
       const markOdd = isOdd && viewState.showOdd;
       const marker = L.circleMarker([node.lat, node.lng], {
         radius: isStart ? 8 : markOdd ? 6 : 4.5,
@@ -176,11 +176,14 @@
           `Lat: ${node.lat.toFixed(6)}, Lng: ${node.lng.toFixed(6)}`,
       );
       marker.bindTooltip(node.id, { permanent: true, direction: "top" });
-      marker.on("click", () => viewState.onNodeClick(node.id));
+      marker.on("click", () => {
+        if (viewState.subgraphActive) viewState.toggleSubgraphNode(node.id);
+        else viewState.onNodeClick(node.id);
+      });
       marker.addTo(networkLayer!);
     }
 
-    if (cpp && viewState.showTour) {
+    if (!viewState.subgraphActive && cpp && viewState.showTour) {
       for (const edge of cpp.augmentedEdges) {
         const a = latlng(edge.source);
         const b = latlng(edge.target);
@@ -194,7 +197,7 @@
       }
     }
 
-    if (viewState.showRoute && viewState.route) {
+    if (!viewState.subgraphActive && viewState.showRoute && viewState.route) {
       const path = viewState.route.path
         .map((id) => latlng(id))
         .filter((p): p is L.LatLngExpression => p !== null);
@@ -218,10 +221,11 @@
       }
     }
 
-    if (!fitted) {
+    const key = viewState.subgraphActive ? viewState.subgraphIds.join("|") : "full";
+    if (key !== fittedKey && graph.nodes.length > 0) {
+      fittedKey = key;
       const bounds = L.latLngBounds(graph.nodes.map((n) => [n.lat, n.lng] as L.LatLngTuple));
       map.fitBounds(bounds, { padding: [24, 24] });
-      fitted = true;
     }
     syncWeightLabels();
     drawProgress();
@@ -257,6 +261,8 @@
     void viewState.showTour;
     void viewState.showRoute;
     void viewState.route;
+    void viewState.subgraphIds;
+    void viewState.subgraphActive;
     if (map) draw();
   });
 

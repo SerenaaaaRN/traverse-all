@@ -5,6 +5,10 @@
  * Kompleksitas O(M) amortized — setiap edge dikonsumsi tepat satu kali
  * dan entri yang sudah terpakai di-pop secara lazy.
  */
+import type { PatrolGraph } from "@algorithms/types";
+import { calculateDegrees, findOddNodes } from "./degrees";
+import { isConnected } from "./connectivity";
+
 export interface HierholzerEdge {
   source: string;
   target: string;
@@ -67,4 +71,73 @@ export function hierholzer(
 
   circuit.reverse();
   return circuit;
+}
+
+/** Status Eulerian dari sebuah graf berdasarkan derajat simpulnya. */
+export type EulerStatus = "circuit" | "path" | "none";
+
+/** Hasil klasifikasi sirkuit/lintasan Euler pada sebuah graf. */
+export interface EulerClassification {
+  status: EulerStatus;
+  connected: boolean;
+  oddNodes: string[];
+  reason: string;
+}
+
+/**
+ * Menentukan apakah graf memiliki sirkuit Euler, lintasan Euler, atau tidak
+ * keduanya. Graf harus terhubung, memiliki ruas, dan tidak mengandung simpul
+ * terisolasi. Kompleksitas O(V + M).
+ */
+export function classifyEuler(graph: PatrolGraph): EulerClassification {
+  const oddNodes = findOddNodes(graph);
+  const connected = isConnected(graph);
+  const base = { connected, oddNodes };
+
+  if (graph.nodes.length === 0) {
+    return { ...base, status: "none", reason: "Graf kosong: tidak ada simpul." };
+  }
+  if (graph.edges.length === 0) {
+    return {
+      ...base,
+      status: "none",
+      reason: "Tidak ada ruas untuk dibentuk lintasan.",
+    };
+  }
+  if (!connected) {
+    return {
+      ...base,
+      status: "none",
+      reason: "Graf tidak terhubung: seluruh ruas tidak dapat ditempuh.",
+    };
+  }
+  const isolated = [...calculateDegrees(graph).values()].some(
+    (degree) => degree.degree === 0,
+  );
+  if (isolated) {
+    return {
+      ...base,
+      status: "none",
+      reason: "Ada simpul terisolasi di dalam subgraf.",
+    };
+  }
+  if (oddNodes.length === 0) {
+    return {
+      ...base,
+      status: "circuit",
+      reason: "Semua simpul berderajat genap dan graf terhubung.",
+    };
+  }
+  if (oddNodes.length === 2) {
+    return {
+      ...base,
+      status: "path",
+      reason: "Tepat dua simpul berderajat ganjil: lintasan Euler terbuka.",
+    };
+  }
+  return {
+    ...base,
+    status: "none",
+    reason: `${oddNodes.length} simpul ganjil; sirkuit butuh 0 dan lintasan butuh 2.`,
+  };
 }

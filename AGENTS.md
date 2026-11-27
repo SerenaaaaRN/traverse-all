@@ -62,9 +62,10 @@ $derived di routes → props ke graph-view.svelte / degree-table.svelte → Leaf
 - `hasEulerCircuit` / `hasEulerPath` di `CPPResult` menggambarkan **graf awal**, bukan graf hasil augmentasi.
 - Tidak ada brute force / blossom: 40 simpul ganjil ⇒ 39!! kombinasi; strategi dipilih agar bisa dijelaskan di presentasi.
 
-**Fitur sudah dibangun:** peta Leaflet + overlay tour, halaman analisis, perbandingan,
-teori, tabel derajat, demo animasi tour (play/pause/step), rute terpendek Dijkstra lewat
-waypoint, 50 test otomatis, dokumentasi (`README.md`, `GUIDE.md`, `docs/Laporan.md`).
+**Fitur sudah dibangun:** peta Leaflet + overlay tour, mode graf dengan layout otomatis,
+halaman analisis, perbandingan, teori, tabel derajat, klasifikasi sirkuit/lintasan Euler
+pada subgraf pilihan (contoh acak tiap klik), demo animasi tour (play/pause/step), rute terpendek Dijkstra lewat
+waypoint, 63 test otomatis, dokumentasi (`README.md`, `docs/Laporan.md`).
 
 **Belum dibangun:** backend/API, database, auth/RBAC, form, pagination, k-shortest paths,
 export CSV/JSON, i18n, konfigurasi deploy.
@@ -113,8 +114,8 @@ terbuka; tidak ada pembedaan permission.
 │   └── euler.test.ts / matching.test.ts / route.test.ts
 ├── docs/Laporan.md            # laporan akademik (Bab 1–4)
 ├── .router/                   # GENERATED oleh sv-router (gitignored)
-├── vite.config.ts             # plugin: svelte, tailwindcss, router; 5 alias
-├── tsconfig.app.json          # strict + alias + resolveJsonModule (JSON tak dipakai)
+├── vite.config.ts             # plugin: svelte, tailwindcss, router; 4 alias
+├── tsconfig.app.json          # strict + alias (tanpa @ui / barrel @data)
 └── tsconfig.json              # solution config + alias
 ```
 
@@ -164,10 +165,10 @@ langsung dari `$derived` di halaman.
 | Routing | `sv-router` 0.19 (file-based, generated `.router/`) |
 | UI / styling | Tailwind CSS 4 via `@tailwindcss/vite`, `h-[100dvh]` layout |
 | Peta | Leaflet 1.9 + tile OpenStreetMap (`preferCanvas: true`) |
-| State | Module rune `$state` di `src/lib/graph-state.svelte.ts` |
+| State | Module rune `$state` di `graph-state.svelte.ts` + `view-state.svelte.ts` |
 | Data | Objek TypeScript statis (`satisfies`), tanpa fetch |
-| Test | `bun test` (50 test) |
-| Sisa dependensi | `cytoscape` + `@types/cytoscape` masih terpasang tapi **tidak dipakai** |
+| Test | `bun test` (63 test) |
+| Algoritma | Fungsi murni, tanpa dependency pihak ketiga |
 
 ### Technical Decisions
 

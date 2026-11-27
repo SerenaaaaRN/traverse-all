@@ -18,20 +18,20 @@
   let last = { x: 0, y: 0 };
   let layoutKey = "";
 
-  const graph = $derived(graphState.graph());
+  const graph = $derived(viewState.subgraphActive ? viewState.subgraph : graphState.graph());
   const degrees = $derived(calculateDegrees(graph));
   const cpp = $derived(viewState.cpp);
-  const circuit = $derived(cpp?.eulerCircuit ?? []);
+  const circuit = $derived(viewState.subgraphActive ? [] : (cpp?.eulerCircuit ?? []));
   const step = $derived(viewState.tourStep ?? 0);
   const currentId = $derived(circuit[step] ?? null);
   const previousId = $derived(circuit[Math.max(step - 1, 0)] ?? null);
   const visited = $derived(new Set(circuit.slice(0, step + 1)));
-  const routePath = $derived(viewState.route?.path ?? []);
-  const startId = $derived(viewState.startNodeValid ? viewState.startNode : "P74");
+  const routePath = $derived(viewState.subgraphActive ? [] : (viewState.route?.path ?? []));
+  const startId = $derived(viewState.subgraphActive ? null : viewState.startNodeValid ? viewState.startNode : "P74");
 
   const visitedEdges = $derived.by(() => {
     const keys = new Set<string>();
-    if (!viewState.showTour || viewState.tourStep === null) return keys;
+    if (viewState.subgraphActive || !viewState.showTour || viewState.tourStep === null) return keys;
     const last = Math.min(viewState.tourStep, circuit.length - 1);
     for (let i = 0; i < last; i++) {
       const a = circuit[i];
@@ -150,7 +150,7 @@
         {/if}
       {/each}
 
-      {#if viewState.showTour && viewState.tourStep === null}
+      {#if viewState.showTour && viewState.tourStep === null && !viewState.subgraphActive}
         {#each circuit as id, i (i)}
           {@const nextId = circuit[i + 1]}
           {@const a = id === undefined ? undefined : positions.get(id)}
@@ -161,7 +161,7 @@
         {/each}
       {/if}
 
-      {#if cpp && viewState.showTour}
+      {#if cpp && viewState.showTour && !viewState.subgraphActive}
         {#each cpp.augmentedEdges as edge, i (i)}
           {@const a = positions.get(edge.source)}
           {@const b = positions.get(edge.target)}
@@ -171,7 +171,7 @@
         {/each}
       {/if}
 
-      {#if viewState.showRoute && viewState.route}
+      {#if viewState.showRoute && viewState.route && !viewState.subgraphActive}
         {#each routePath as id, i (i)}
           {@const nextId = routePath[i + 1]}
           {@const a = id === undefined ? undefined : positions.get(id)}
@@ -195,10 +195,8 @@
             stroke-width="2"
             role="button"
             tabindex="0"
-            onclick={() => viewState.onNodeClick(node.id)}
-            onkeydown={(e) => {
-              if (e.key === "Enter" || e.key === " ") viewState.onNodeClick(node.id);
-            }}
+            onclick={() => { if (viewState.subgraphActive) viewState.toggleSubgraphNode(node.id); else viewState.onNodeClick(node.id); }}
+            onkeydown={(e) => { if (e.key === "Enter" || e.key === " ") { if (viewState.subgraphActive) viewState.toggleSubgraphNode(node.id); else viewState.onNodeClick(node.id); } }}
             class="cursor-pointer"
           />
           <text x={p.x} y={p.y - 14} text-anchor="middle" font-size="11" pointer-events="none">{node.id}</text>

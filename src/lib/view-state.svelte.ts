@@ -16,6 +16,20 @@ class ViewState {
     this.startNode = "P74";
   }
 
+  subgraphIds = $state<string[]>([]);
+  subgraphActive = $derived(this.subgraphIds.length > 0);
+  subgraph = $derived(graphState.subgraph(this.subgraphIds));
+
+  toggleSubgraphNode(id: string): void {
+    const index = this.subgraphIds.indexOf(id);
+    if (index === -1) this.subgraphIds.push(id);
+    else this.subgraphIds.splice(index, 1);
+  }
+
+  setSubgraphIds(ids: string[]): void {
+    this.subgraphIds.splice(0, this.subgraphIds.length, ...ids);
+  }
+
   cpp = $derived.by<CPPResult | null>(() => {
     try {
       return solveCPP(

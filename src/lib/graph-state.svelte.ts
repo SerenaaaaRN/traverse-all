@@ -13,6 +13,17 @@ class GraphState {
   nodeById(id: string): PatrolNode | undefined {
     return this.nodes.find((n) => n.id === id);
   }
+
+  /** Menyusun graf dari simpul yang dipilih beserta ruas di antaranya. */
+  subgraph(nodeIds: string[]): PatrolGraph {
+    const selected = new Set(nodeIds);
+    return {
+      nodes: this.nodes.filter((node) => selected.has(node.id)),
+      edges: this.edges.filter(
+        (edge) => selected.has(edge.source) && selected.has(edge.target),
+      ),
+    };
+  }
 }
 
 export const graphState = new GraphState();

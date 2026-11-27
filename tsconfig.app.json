@@ -11,13 +11,10 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
-    "resolveJsonModule": true,
     /* Path mapping (sinkron dengan alias vite.config.ts) */
     "paths": {
       "@algorithms/*": ["./src/algorithms/*"],
-      "@data": ["./src/data/index.ts"],
       "@data/*": ["./src/data/*"],
-      "@ui/*": ["./src/ui/*"],
       "@lib/*": ["./src/lib/*"],
       "@components/*": ["./src/components/*"],
       "sv-router/generated": ["./.router/router.ts"]

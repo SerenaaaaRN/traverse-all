@@ -49,10 +49,10 @@ graph the full width.
 | Route | Content |
 |---|---|
 | `/` | Network overview and vertex selection |
+| `/nodes` | Subgraph picker with randomized Euler examples; map focuses the selection |
 | `/analysis` | CPP metrics, duplicated edges, and animated tour |
 | `/comparison` | Baseline duplication versus CPP |
 | `/route` | Shortest path through waypoints |
-| `/nodes` | Vertex degree table |
 | `/theory` | Graph theory and CPP background |
 
 ## Structure
