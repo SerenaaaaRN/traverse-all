@@ -23,7 +23,6 @@ Every number shown in the UI is derived from `solveCPP()` and
 bun install
 bun run dev
 bun run check
-bun test
 bun run build
 ```
 
@@ -65,7 +64,6 @@ src/
 ├── lib/            state runes, graph layout, colours, helpers
 ├── components/     flat Svelte components (kebab-case)
 └── routes/         file-based pages (sv-router)
-tests/              algorithm unit tests (bun test)
 docs/Laporan.md     academic report
 ```
 

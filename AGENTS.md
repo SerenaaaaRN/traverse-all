@@ -65,7 +65,7 @@ $derived di routes → props ke graph-view.svelte / degree-table.svelte → Leaf
 **Fitur sudah dibangun:** peta Leaflet + overlay tour, mode graf dengan layout otomatis,
 halaman analisis, perbandingan, teori, tabel derajat, klasifikasi sirkuit/lintasan Euler
 pada subgraf pilihan (contoh acak tiap klik), demo animasi tour (play/pause/step), rute terpendek Dijkstra lewat
-waypoint, 63 test otomatis, dokumentasi (`README.md`, `docs/Laporan.md`).
+waypoint, dokumentasi (`README.md`, `docs/Laporan.md`).
 
 **Belum dibangun:** backend/API, database, auth/RBAC, form, pagination, k-shortest paths,
 export CSV/JSON, i18n, konfigurasi deploy.
@@ -108,10 +108,6 @@ terbuka; tidak ada pembedaan permission.
 │   ├── app.css                # @import "tailwindcss"
 │   ├── app.svelte             # <Router /> dari sv-router
 │   └── main.ts                # mount(App, ...)
-├── tests/                     # bun test
-│   ├── helpers.ts             # makeGraph, matrixFromGraph
-│   ├── cpp.test.ts / degrees.test.ts / dijkstra.test.ts
-│   └── euler.test.ts / matching.test.ts / route.test.ts
 ├── docs/Laporan.md            # laporan akademik (Bab 1–4)
 ├── .router/                   # GENERATED oleh sv-router (gitignored)
 ├── vite.config.ts             # plugin: svelte, tailwindcss, router; 4 alias
@@ -119,8 +115,8 @@ terbuka; tidak ada pembedaan permission.
 └── tsconfig.json              # solution config + alias
 ```
 
-**Pola modul:** satu file = satu tanggung jawab; tipe di `types.ts`; implementasi + test
-berpasangan. **Pola endpoint/query:** tidak ada — satu fungsi `solveCPP(graph)` dipanggil
+**Pola modul:** satu file = satu tanggung jawab; tipe di `types.ts`; implementasi di
+`algorithms/*.ts`. **Pola endpoint/query:** tidak ada — satu fungsi `solveCPP(graph)` dipanggil
 langsung dari `$derived` di halaman.
 
 ---
@@ -153,7 +149,7 @@ langsung dari `$derived` di halaman.
 - Angka di UI **selalu berasal dari `solveCPP()` / `calculateDegrees()`**, bukan literal hardcode.
 - Satu sumber kebenaran data: `nodes.ts` + `edges.ts`. Tidak ada JSON, barrel, atau runtime validator.
 - Urutan eksekusi fitur per layer:
-  `data → types → algorithms → graphState → components → routes → tests → docs`.
+  `data → types → algorithms → graphState → components → routes → docs`.
 
 ---
 
@@ -167,7 +163,6 @@ langsung dari `$derived` di halaman.
 | Peta | Leaflet 1.9 + tile OpenStreetMap (`preferCanvas: true`) |
 | State | Module rune `$state` di `graph-state.svelte.ts` + `view-state.svelte.ts` |
 | Data | Objek TypeScript statis (`satisfies`), tanpa fetch |
-| Test | `bun test` (63 test) |
 | Algoritma | Fungsi murni, tanpa dependency pihak ketiga |
 
 ### Technical Decisions
@@ -179,7 +174,7 @@ langsung dari `$derived` di halaman.
 | Greedy "pasangan terdekat" | O(k² log k), mudah dijelaskan |
 | Leaflet + OSM, bukan Cytoscape | Koordinat `lat/lng` asli, peta geografis nyata |
 | Module rune, bukan props drilling | State persisten antar route |
-| Algoritma pure function | Mudah diuji dengan known-answer test |
+| Algoritma pure function | Mudah diverifikasi lewat web |
 | Komponen flat + kebab-case + alias `@components` | Import konsisten, tanpa folder `domain/` |
 
 ---
@@ -188,8 +183,7 @@ langsung dari `$derived` di halaman.
 
 Tidak ada HTTP API. Konvensi layer komputasi:
 
-- **Struktur vertikal per modul:** tipe di `types.ts`, implementasi di `algorithms/*.ts`,
-  pengujian di `tests/*.test.ts`.
+- **Struktur vertikal per modul:** tipe di `types.ts`, implementasi di `algorithms/*.ts`.
 - **Guard / precondition:** `solveCPP` menolak graf kosong dan disconnected;
   `findGreedyMatching` menolak jumlah odd ganjil.
 - **Validasi:** compile-time (`satisfies PatrolNode[]` / `satisfies PatrolEdge[]`).
@@ -287,7 +281,6 @@ statis dan ikut terbundle ke JavaScript produksi (~230 kB).
 Ganti peran "database" dengan:
 - `src/data/nodes.ts` + `edges.ts` → penyimpanan data.
 - `graph-state.svelte.ts` → akses data saat runtime.
-- `tests/*.test.ts` → pengujian algoritma (known-answer).
 
 ---
 
@@ -318,7 +311,7 @@ interface CPPResult {
 ```
 
 Relasi: `PatrolEdge.source` / `.target` → `PatrolNode.id` (undirected).
-Tidak ada foreign key fisik; validator dihapus, jadi **test yang menjaga** konsistensi endpoint.
+Tidak ada foreign key fisik; validator dihapus, jadi konsistensi endpoint dijaga oleh konvensi data statis.
 
 ---
 
@@ -359,7 +352,7 @@ Tile OSM dimuat dari URL publik tetap di `graph-view.svelte` (bukan env var).
 
 **Workflow**
 - [ ] Lupa `bun run gen-routes` setelah menambah file route.
-- [ ] Menjalankan `bun test` / `bun run check` / `bun run build` setelah mengubah data atau algoritma.
+- [ ] Menjalankan `bun run check` / `bun run build` setelah mengubah data atau algoritma.
 
 ---
 

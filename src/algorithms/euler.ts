@@ -46,24 +46,17 @@ export function hierholzer(
       continue;
     }
 
-    let lastIndex = list.length - 1;
-    while (lastIndex >= 0) {
-      const candidate = list[lastIndex];
-      if (candidate === undefined || used.has(candidate)) list.pop();
-      else break;
-      lastIndex = list.length - 1;
-    }
-
-    const nextEdge = list[list.length - 1];
-    if (nextEdge === undefined) {
+    const edgeIndex = list.pop();
+    if (edgeIndex === undefined) {
       circuit.push(current);
       stack.pop();
       continue;
     }
+    if (used.has(edgeIndex)) continue;
 
-    const edge = edges[nextEdge];
+    const edge = edges[edgeIndex];
     if (!edge) return null;
-    used.add(nextEdge);
+    used.add(edgeIndex);
     stack.push(edge.source === current ? edge.target : edge.source);
   }
 

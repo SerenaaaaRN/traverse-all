@@ -347,7 +347,6 @@ Implementasi menggunakan TypeScript dengan Vite dan Svelte 5:
   Formulasi Hierholzer mengikuti uraian cp-algorithms dan NetworkX.
 - **Svelte 5** (runes) untuk antarmuka dan `sv-router` untuk navigasi.
 - **Leaflet** + OpenStreetMap untuk peta jaringan.
-- **Bun test** untuk pengujian otomatis.
 
 Struktur utama:
 
@@ -367,8 +366,7 @@ src/
 │   └── edges.ts         # 115 ruas (typed)
 ├── lib/graph-state.svelte.ts
 ├── components/          # graph-view.svelte (Leaflet), degree-table.svelte
-├── routes/              # index, analysis, comparison, theory
-└── tests/               # bun test
+└── routes/              # index, analysis, comparison, theory
 ```
 
 Perintah utama:
@@ -376,13 +374,12 @@ Perintah utama:
 ```bash
 bun install
 bun run dev
-bun test
 bun run check
 ```
 
 ### 3.5 Pembahasan
 
-#### 3.5.1 Hasil Pengujian
+#### 3.5.1 Hasil Perhitungan
 
 | Metrik | Nilai |
 |---|---:|
@@ -406,16 +403,6 @@ $$
 Rute hasil pasangan terdekat menghemat 14,510 km dibanding baseline. Strategi
 ini tidak menjamin biaya minimum mutlak, tetapi mudah dijelaskan dan cukup
 efektif untuk kasus ini.
-
-Pengujian otomatis terdiri dari 63 test dalam 6 file:
-
-1. Derajat simpul dan identifikasi simpul ganjil (`degrees.test.ts`).
-2. Dijkstra dan matriks jarak terpendek (`dijkstra.test.ts`).
-3. Hierholzer menghasilkan sirkuit Euler yang valid (`euler.test.ts`).
-4. Pasangan terdekat: known-answer dan path Dijkstra (`matching.test.ts`).
-5. Pipeline CPP: C4, dua simpul ganjil, augmentasi, graf terputus, dan
-   validitas rute (`cpp.test.ts`).
-6. Rute A→B lewat waypoint: gabungan segmen dan known-answer (`route.test.ts`).
 
 #### 3.5.2 Analisis Kompleksitas
 
