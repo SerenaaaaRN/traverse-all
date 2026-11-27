@@ -2,8 +2,6 @@
 
 ## ANALISIS LINTASAN EULER DAN OPTIMASI RUTE PATROLI KEAMANAN KILANG PERTAMINA PLAJU MENGGUNAKAN CHINESE POSTMAN PROBLEM
 
-2026
-
 ---
 
 ## BAB 1 Pendahuluan
@@ -20,20 +18,20 @@ dituntut menempuh setiap ruas jalan internal yang telah ditentukan.
 Permasalahan utama patroli manual adalah rute yang tidak terencana. Petugas
 sering melewati ruas yang sama berulang kali, sementara ruas lain justru
 terlewat. Tanpa perencanaan berbasis graf, jarak tempuh menjadi lebih panjang
-dan waktu patroli tidak efisien. Studi kasus ini memanfaatkan teori graf
+dan waktu patroli menjadi lebih lama. Studi kasus ini memanfaatkan teori graf
 berbobot, khususnya analisis derajat simpul dan Chinese Postman Problem (CPP),
-untuk membentuk rute patroli tertutup yang menempuh setiap ruas jalan minimal
-satu kali dengan total jarak seminimal mungkin.
+untuk membentuk rute patroli tertutup yang menempuh setiap ruas jalan sekali
+atau lebih dengan total jarak seminimal mungkin.
 
 ### 1.2 Rumusan Masalah
 
 1. Bagaimana memodelkan jaringan jalan internal Kilang Pertamina Plaju sebagai
-   graf berbobot terhubung dengan bobot berupa jarak aktual antar titik
+   graf berbobot terhubung dengan bobot berupa jarak geometris antar titik
    tracking?
 2. Berapa jumlah simpul berderajat ganjil pada graf tersebut, dan apakah graf
    memenuhi syarat lintasan atau sirkuit Euler?
 3. Bagaimana menentukan rute patroli keamanan tertutup yang menempuh setiap
-   ruas jalan minimal satu kali dengan total jarak minimum menggunakan
+   ruas jalan minimal satu kali dengan total jarak minimum melalui pendekatan
    Chinese Postman Problem?
 4. Bagaimana strategi memasangkan simpul ganjil yang sederhana (pasangan
    terdekat) dan seberapa besar efisiensinya terhadap baseline?
@@ -51,8 +49,9 @@ satu kali dengan total jarak seminimal mungkin.
 1. Graf dimodelkan sebagai graf tak berarah; edge satu arah tidak dibedakan.
 2. Bobot edge adalah jarak geometris antar titik tracking, bukan panjang jalan
    sebenarnya.
-3. Data mencakup jalan internal yang di-tracking, bukan seluruh aset kilang.
-4. Edge paralel antara dua simpul diperbolehkan; bobot minimum yang dipakai.
+3. Data mencakup jalan internal yang menjadi hasil tracking titik, bukan
+   seluruh aset kilang.
+4. Edge paralel antara dua simpul diperbolehkan; bobot minimum yang digunakan.
 5. Titik awal patroli adalah `P74`, yaitu gerbang utama kilang.
 
 ---
@@ -132,9 +131,8 @@ Karakteristik graf:
 |---|---:|
 | Simpul | 74 |
 | Sisi | 115 |
-| Total bobot | 19.339 km |
+| Total bobot | 19,339 km |
 | Komponen terhubung | 1 |
-| Cyclomatic number (`μ`) | 42 |
 | Siklus dasar | 42 |
 | Bridge | 2 |
 | Simpul ganjil | 40 |
@@ -150,7 +148,7 @@ Jaringan dimodelkan sebagai graf berbobot tak berarah
 $G = (V, E, w)$ dengan:
 
 - $V = \{P01, P02, \ldots, P74\}$;
-- $E \subseteq \{\{u,v\} \mid u,v \in V, u \neq v\}$;
+- $E$ adalah multihimpunan pasangan $\{u,v\}$ dengan $u,v \in V,\ u \neq v$;
 - $w(e)$ adalah jarak antar titik dalam kilometer.
 
 Derajat simpul dihitung sebagai:
@@ -169,14 +167,14 @@ $$
 
 1. **Konstruksi graf:** membaca `src/data/nodes.ts` dan `src/data/edges.ts`,
    lalu merakit objek `PatrolGraph` dengan bobot dalam kilometer.
-2. **Audit topologi:** memeriksa konektivitas, `μ`, siklus dasar, bridge, dan
-   derajat simpul.
+2. **Audit topologi:** konektivitas dan derajat dihitung oleh program; nilai `μ`,
+   siklus dasar, dan bridge dihitung manual sebagai pelengkap analisis.
 3. **Identifikasi odd node:** mengelompokkan simpul dengan derajat ganjil.
 4. **Dijkstra:** menghitung jarak dan path terpendek antar semua pasangan odd
    node (Dijkstra, 1959).
 5. **Pasangan simpul ganjil:** mengurutkan semua pasangan berdasarkan jarak
    Dijkstra, lalu memilih pasangan terdekat yang kedua ujungnya belum terpakai.
-6. **Augmentasi:** menyalin setiap ruas path pasangan ke graf sebagai edge
+6. **Augmentasi:** menyalin setiap jalur pasangan ke graf sebagai edge
    paralel.
 7. **Sirkuit Euler:** membentuk urutan tour dengan algoritma Hierholzer
    (Hierholzer, 1873).
@@ -222,7 +220,7 @@ lintasan Euler.
 
 #### 3.1.2 Matching Manual Subgraf
 
-Dengan Dijkstra pada subgraf, diperoleh pasangan simpul ganjil sebagai berikut:
+Sebagai ilustrasi, pasangan simpul ganjil pada subgraf dipilih sebagai berikut:
 
 | Pasangan | Path | Biaya (km) |
 |---|---|---:|
@@ -299,12 +297,12 @@ Aturan pasangan terdekat menghasilkan 20 pasangan:
 
 Biaya augmentasi adalah **4,829 km**. Pasangan `P12–P21` paling mahal karena
 keduanya adalah simpul berderajat 1 yang letaknya saling berjauhan, sehingga
-baru dipasangkan setelah pasangan lain habis. Untuk edge paralel `P49–P74`,
-bobot minimum (0,140 km) yang dipakai agar konsisten dengan Dijkstra.
+baru dipasangkan setelah pasangan lain terpakai. Untuk edge paralel `P49–P74`,
+bobot minimum (0,140 km) yang digunakan agar konsisten dengan Dijkstra.
 
 #### 3.2.3 Augmentasi dan Sirkuit Euler
 
-Setiap ruas path pasangan disalin ke graf sebagai edge paralel bertanda
+Setiap jalur pasangan disalin ke graf sebagai edge paralel bertanda
 `augmented`. Setelah augmentasi, seluruh derajat simpul menjadi genap sehingga
 graf bersirkuit Euler. Sirkuit Euler kemudian dibentuk mulai dari `P74` (gerbang).
 
@@ -314,8 +312,8 @@ $$
 19{,}339 + 4{,}829 = 24{,}168 \text{ km}
 $$
 
-Jumlah edge traversal adalah 153 langkah, terdiri dari 115 edge asli dan 37
-edge augmentasi.
+Urutan rute memuat 153 entri simpul (berawal dan berakhir di `P74`), yang
+setara dengan 152 ruas traversal: 115 ruas asli dan 37 ruas augmentasi.
 
 ### 3.3 Visualisasi
 
@@ -329,11 +327,14 @@ Visualisasi dapat ditampilkan dalam dua mode dari dataset yang sama:
 
 Kedua mode memakai `PatrolGraph` dan hasil `solveCPP()` yang sama:
 
-- Halaman **Peta Graf** — jaringan jalan, simpul ganjil, dan titik awal `P74`.
+- Halaman **Peta** — jaringan jalan, simpul ganjil, titik awal `P74`, dan
+  ringkasan efisiensi CPP terhadap baseline.
+- Halaman **Subgraf** — memilih sekumpulan simpul, lalu menentukan apakah
+  subgraf tersebut membentuk sirkuit Euler, lintasan Euler, atau tidak;
+  contoh diambil secara acak pada setiap klik dan peta mengikuti seleksi.
 - Halaman **Analisis** — metrik, daftar simpul ganjil, ruas yang diulang,
   tabel derajat, dan urutan rute postman.
-- Halaman **Perbandingan** — total tour patroli dibanding baseline.
-- Halaman **Teori** — definisi derajat, Euler, dan CPP.
+- Halaman **Rute** — rute terpendek antar simpul melalui waypoint.
 
 Simpul ganjil ditandai merah, titik awal hijau, dan ruas hasil augmentasi
 ditandai merah putus-putus.
@@ -348,26 +349,22 @@ Implementasi menggunakan TypeScript dengan Vite dan Svelte 5:
 - **Svelte 5** (runes) untuk antarmuka dan `sv-router` untuk navigasi.
 - **Leaflet** + OpenStreetMap untuk peta jaringan.
 
-Struktur utama:
+Struktur algoritma:
 
 ```text
-src/
-├── algorithms/
-│   ├── types.ts         # kontrak tipe PatrolGraph, CPPResult, dll.
-│   ├── degrees.ts       # derajat dan simpul ganjil
-│   ├── connectivity.ts  # BFS konektivitas
-│   ├── dijkstra.ts      # jarak & path terpendek
-│   ├── route.ts         # rute A→B lewat waypoint
-│   ├── matching.ts      # pasangan simpul terdekat
-│   ├── euler.ts         # Hierholzer
-│   └── cpp.ts           # pipeline CPP
-├── data/
-│   ├── nodes.ts         # 74 simpul (typed)
-│   └── edges.ts         # 115 ruas (typed)
-├── lib/graph-state.svelte.ts
-├── components/          # graph-view.svelte (Leaflet), degree-table.svelte
-└── routes/              # index, analysis, comparison, theory
+src/algorithms/
+├── types.ts         kontrak tipe PatrolGraph, CPPResult, dll.
+├── degrees.ts       derajat dan simpul ganjil
+├── connectivity.ts  konektivitas (BFS)
+├── dijkstra.ts      jarak dan jalur terpendek
+├── route.ts         rute A→B lewat waypoint
+├── matching.ts      pasangan simpul terdekat
+├── euler.ts         klasifikasi Euler + Hierholzer
+└── cpp.ts           pipeline CPP
 ```
+
+Seluruh kode algoritma dapat dilihat di
+https://github.com/SerenaaaaRN/traverse-all/tree/main/src/algorithms
 
 Perintah utama:
 
@@ -377,16 +374,18 @@ bun run dev
 bun run check
 ```
 
-### 3.5 Pembahasan
+Kode sumber proyek tersedia di https://github.com/SerenaaaaRN/traverse-all,
+sedangkan aplikasi yang telah diterbitkan dapat diakses di
+https://traverse-all.vercel.app/.
 
-#### 3.5.1 Hasil Perhitungan
+### 3.5 Pembahasan
 
 | Metrik | Nilai |
 |---|---:|
 | Bobot dasar | 19,339 km |
 | Augmentasi (pasangan terdekat) | 4,829 km |
 | Total tour | **24,168 km** |
-| Jumlah langkah | 153 (115 asli + 37 augmentasi) |
+| Entri rute / ruas traversal | 153 entri / 152 ruas (115 asli + 37 augmentasi) |
 
 Baseline jika semua edge dilewati dua kali:
 
@@ -400,23 +399,10 @@ $$
 \frac{38{,}678 - 24{,}168}{38{,}678} \times 100\% = 37{,}51\%
 $$
 
-Rute hasil pasangan terdekat menghemat 14,510 km dibanding baseline. Strategi
-ini tidak menjamin biaya minimum mutlak, tetapi mudah dijelaskan dan cukup
-efektif untuk kasus ini.
+Rute hasil pasangan terdekat menghemat 14,510 km dibandingkan dengan kondisi
+dasar. Strategi ini tidak menjamin biaya minimum mutlak, tetapi mudah dijelaskan
+dan cukup efektif untuk kasus ini.
 
-#### 3.5.2 Analisis Kompleksitas
-
-Jika $V$ adalah jumlah simpul, $E$ jumlah sisi, dan $k$ jumlah simpul ganjil:
-
-- Audit konektivitas dan derajat: $O(V + E)$.
-- Dijkstra dari setiap simpul ganjil: $O(k(E + V \log V))$.
-- Pasangan terdekat: $O(k^2 \log k)$.
-- Augmentasi path: $O(k \cdot V)$.
-- Sirkuit Euler: $O(E)$.
-
-Untuk $V = 74$, $E = 115$, dan $k = 40$, seluruh komputasi berjalan cepat.
-Pendekatan ini sengaja dipilih karena dapat dijelaskan dengan sederhana dan
-tidak memerlukan algoritma matching yang kompleks.
 
 ---
 
@@ -424,60 +410,62 @@ tidak memerlukan algoritma matching yang kompleks.
 
 ### 4.1 Kesimpulan
 
-1. Jaringan jalan internal Kilang Pertamina Plaju berhasil dimodelkan sebagai
-   graf berbobot tak berarah dengan 74 simpul, 115 sisi, dan total bobot
-   19,339 km.
-2. Graf terhubung dan memiliki 42 siklus dasar, sehingga CPP dapat diterapkan
-   secara bermakna.
-3. Terdapat 40 simpul berderajat ganjil. Graf awal tidak memiliki lintasan
-   maupun sirkuit Euler.
-4. Pasangan simpul ganjil dengan aturan terdekat menghasilkan biaya augmentasi
-   4,829 km dan total tour patroli **24,168 km**.
-5. Rute patroli menempuh 153 langkah, terdiri dari 115 ruas asli dan 37 ruas
-   yang diulang.
-6. Dibandingkan baseline duplikasi seluruh edge sebesar 38,678 km, rute CPP
-   menghemat **37,51%** jarak tempuh.
+Jaringan jalan internal Kilang Pertamina Plaju berhasil dimodelkan sebagai graf
+berbobot tak berarah dengan 74 simpul, 115 sisi, dan total bobot 19,339 km. Graf
+terhubung dan memiliki 42 siklus dasar, sehingga CPP dapat diterapkan secara
+bermakna. Dari 74 simpul tersebut, 40 berderajat ganjil; karena jumlahnya melebihi
+dua, graf awal tidak memiliki lintasan maupun sirkuit Euler.
+
+Dengan aturan pasangan terdekat, biaya augmentasi sebesar 4,829 km menghasilkan
+rute patroli tertutup sejauh 24,168 km. Rute memuat 153 entri simpul, atau 152
+ruas traversal yang terdiri dari 115 ruas asli dan 37 ruas yang diulang.
+Dibandingkan dengan kondisi dasar duplikasi seluruh edge sebesar 38,678 km, rute
+CPP menghemat **37,51%** jarak tempuh.
 
 ### 4.2 Saran
 
+Beberapa pengembangan yang dapat dilakukan adalah sebagai berikut.
 
-
----
-
-## Daftar Pustaka
-
-Dijkstra, E. W. (1959). A note on two problems in connexion with graphs.
-*Numerische Mathematik, 1*(1), 269–271. https://doi.org/10.1007/BF01386390
-
-Edmonds, J., & Johnson, E. L. (1973). Matching, Euler tours and the Chinese
-postman. *Mathematical Programming, 5*(1), 88–124.
-https://doi.org/10.1007/BF01580113
-
-Euler, L. (1736). Solutio problematis ad geometriam situs pertinentis.
-*Commentarii Academiae Scientiarum Imperialis Petropolitanae, 8*, 128–140.
-
-Hierholzer, C. (1873). Ueber die Möglichkeit, einen Linienzug ohne Wiederholung
-und ohne Unterbrechung zu umfahren. *Mathematische Annalen, 6*(1), 30–32.
-https://doi.org/10.1007/BF01442866
-
-Kuan, M.-K. (1962). Graphic programming using odd or even points. *Chinese
-Mathematics, 1*, 273–277.
-
-cp-algorithms. (n.d.). *Finding an Eulerian path in an undirected graph*.
-https://cp-algorithms.com/graph/euler_path.html (diakses 21 November 2026)
-
-NetworkX. (n.d.). *networkx.algorithms.euler*.
-https://networkx.org/documentation/stable/reference/algorithms/euler.html
-(diakses 21 November 2026)
-
-OpenStreetMap contributors. (n.d.). *OpenStreetMap*. https://www.openstreetmap.org
-(diakses 21 November 2026)
-
-Leaflet. (n.d.). *Leaflet — an open-source JavaScript library for interactive
-maps*. https://leafletjs.com (diakses 21 November 2026)
+1. Mengganti bobot jarak geometris dengan panjang jalan aktual hasil
+   pengukuran lapangan agar total patroli lebih representatif.
+2. Menambah ruas dan titik tracking pada area yang belum tercakup supaya
+   cakupan patroli lebih menyeluruh.
+3. Menyediakan fasilitas impor data titik dan ruas agar dataset dapat
+   diperbarui tanpa mengubah kode.
+4. Menyediakan ekspor rute ke format CSV/JSON untuk kebutuhan operasional.
 
 ---
 
 ## Lampiran
 
+### Lampiran A — Tautan dan Akses Proyek
+
+- Kode sumber: https://github.com/SerenaaaaRN/traverse-all
+- Folder algoritma: https://github.com/SerenaaaaRN/traverse-all/tree/main/src/algorithms
+- Aplikasi: https://traverse-all.vercel.app/
+- Menjalankan secara lokal: `bun install`, lalu `bun run dev`
+
+### Lampiran B — Dokumentasi
+
+- README proyek: https://github.com/SerenaaaaRN/traverse-all#readme
+- Modul belajar algoritma: `docs/Modul-Belajar-Algoritma.md` (bahan presentasi,
+  tidak dimasukkan ke repository).
+
+Letakkan berkas gambar pada folder `docs/gambar/` dengan nama sesuai contoh di
+bawah ini.
+
+![Pipeline CPP](gambar/kode-cpp.png)
+*Gambar B.1 — Fungsi `solveCPP` pada `src/algorithms/cpp.ts`.*
+
+![Klasifikasi Euler](gambar/kode-euler.png)
+*Gambar B.2 — Fungsi `classifyEuler` pada `src/algorithms/euler.ts`.*
+
+![Pasangan terdekat](gambar/kode-matching.png)
+*Gambar B.3 — Fungsi `findGreedyMatching` pada `src/algorithms/matching.ts`.*
+
+![Tampilan Subgraf](gambar/tampilan-subgraf.png)
+*Gambar B.4 — Halaman Subgraf beserta status klasifikasi Euler.*
+
+![Tampilan Analisis](gambar/tampilan-analisis.png)
+*Gambar B.5 — Halaman Analisis beserta metrik CPP.*
 

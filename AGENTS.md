@@ -46,7 +46,7 @@ PatrolGraph { nodes, edges }
         ├─ buildDistanceMatrix (Dijkstra)
         ├─ findGreedyMatching → 20 pasangan, 4,829 km
         ├─ augmentasi edge sepanjang path pasangan
-        └─ hierholzer → 153 langkah, 24,168 km (mulai P74)
+        └─ hierholzer → 153 entri rute / 152 ruas traversal, 24,168 km (mulai P74)
         │
         ▼
 $derived di routes → props ke graph-view.svelte / degree-table.svelte → Leaflet + OSM
@@ -54,7 +54,8 @@ $derived di routes → props ke graph-view.svelte / degree-table.svelte → Leaf
 
 **Aturan domain utama:**
 
-- Graf **undirected**, satu edge unik per pasangan simpul.
+- Graf **undirected**. Dataset memuat satu pasangan dengan dua ruas (`P74–P49`:
+  0,264 dan 0,140 km); bobot minimum dipakai saat ruas tersebut diulang.
 - Bobot `weightKm` = jarak geometris meter ÷ 1000 (**bukan** panjang jalan aktual).
 - Titik awal tour: `P74` (gerbang kilang) — konstanta `TOUR_START` / parameter `startNode` di `cpp.ts`.
   Konstanta `START` di `graph-view.svelte` hanya mewarnai marker hijau.
@@ -63,12 +64,15 @@ $derived di routes → props ke graph-view.svelte / degree-table.svelte → Leaf
 - Tidak ada brute force / blossom: 40 simpul ganjil ⇒ 39!! kombinasi; strategi dipilih agar bisa dijelaskan di presentasi.
 
 **Fitur sudah dibangun:** peta Leaflet + overlay tour, mode graf dengan layout otomatis,
-halaman analisis, perbandingan, teori, tabel derajat, klasifikasi sirkuit/lintasan Euler
+halaman analisis, tabel derajat, klasifikasi sirkuit/lintasan Euler
 pada subgraf pilihan (contoh acak tiap klik), demo animasi tour (play/pause/step), rute terpendek Dijkstra lewat
 waypoint, dokumentasi (`README.md`, `docs/Laporan.md`).
 
 **Belum dibangun:** backend/API, database, auth/RBAC, form, pagination, k-shortest paths,
-export CSV/JSON, i18n, konfigurasi deploy.
+export CSV/JSON, i18n.
+
+**Deploy:** https://traverse-all.vercel.app/ — Vercel mendeteksi Vite secara otomatis,
+tanpa file konfigurasi deploy di repository.
 
 **Peran & scope pengguna:** satu pengguna (mahasiswa/presenter), tanpa login. Semua halaman
 terbuka; tidak ada pembedaan permission.
@@ -87,24 +91,31 @@ terbuka; tidak ada pembedaan permission.
 │   │   ├── dijkstra.ts        # dijkstraShortestPath, buildDistanceMatrix
 │   │   ├── route.ts           # findRouteThroughStops (A→B lewat waypoint)
 │   │   ├── matching.ts        # findGreedyMatching (pasangan terdekat)
-│   │   ├── euler.ts           # hierholzer
+│   │   ├── euler.ts           # hierholzer, classifyEuler
 │   │   └── cpp.ts             # solveCPP (orkestrasi pipeline)
 │   ├── data/
 │   │   ├── nodes.ts           # 74 simpul, satisfies PatrolNode[]
 │   │   └── edges.ts           # 115 ruas, satisfies PatrolEdge[]
 │   ├── lib/
-│   │   └── graph-state.svelte.ts  # module rune: nodes, edges, graph(), nodeById()
+│   │   ├── graph-state.svelte.ts  # module rune: nodes, edges, graph(), nodeById(), subgraph()
+│   │   ├── view-state.svelte.ts   # module rune: seleksi subgraf (global, lintas route)
+│   │   ├── subgraph-samples.ts    # kandidat contoh subgraf tervalidasi classifyEuler
+│   │   ├── layout.ts              # layout graf otomatis
+│   │   ├── pair-key.ts            # kunci pasangan simpul
+│   │   └── graph-colors.ts        # warna semantik graf
 │   ├── components/            # FLAT, kebab-case
 │   │   ├── graph-view.svelte  # Leaflet + OSM (onMount/onDestroy, layer groups)
-│   │   ├── degree-table.svelte
-│   │   └── tour-player.svelte  # kontrol play/pause/step demo lintasan
+│   │   ├── graph-canvas.svelte    # mode graf (layout otomatis)
+│   │   ├── graph-controls.svelte  # kontrol tampilan peta/graf
+│   │   ├── graph-legend.svelte    # legenda warna semantik
+│   │   ├── degree-table.svelte    # tabel derajat + multi-select subgraf
+│   │   └── tour-player.svelte     # kontrol play/pause/step demo lintasan
 │   ├── routes/                # file-based routing (sv-router)
 │   │   ├── layout.svelte      # nav persist + {@render children()}
 │   │   ├── index.svelte       # peta jaringan
+│   │   ├── nodes.svelte       # subgraf + klasifikasi sirkuit/lintasan Euler
 │   │   ├── analysis.svelte    # metrik + tabel + peta + demo tour
-│   │   ├── comparison.svelte  # baseline vs CPP
-│   │   ├── route.svelte       # perencana rute Dijkstra + waypoint
-│   │   └── theory.svelte      # definisi + contoh kecil
+│   │   └── route.svelte       # perencana rute Dijkstra + waypoint
 │   ├── app.css                # @import "tailwindcss"
 │   ├── app.svelte             # <Router /> dari sv-router
 │   └── main.ts                # mount(App, ...)
@@ -129,7 +140,8 @@ langsung dari `$derived` di halaman.
   halaman di `src/routes/`.
 - Imports memakai alias: `@components/*`, `@algorithms/*`, `@data/*`, `@lib/*` (`@ui/*` ada tapi tidak dipakai).
 - Svelte 5 runes: `$state` di module rune, `$props()`, `$derived` / `$derived.by()`, `$effect`.
-- `graph-state.svelte.ts` adalah satu-satunya state global; jangan props-drill graf antar route.
+- State global hanya di module rune: `graph-state.svelte.ts` (graf) dan
+  `view-state.svelte.ts` (seleksi subgraf); jangan props-drill antar route.
 - Leaflet: inisialisasi di `onMount`, `map.remove()` di `onDestroy`. **Jangan** buat ulang
   instance map saat prop berubah — cukup `clearLayers()` + isi ulang layer group.
 - Warna semantik: merah = simpul ganjil / ruas diulang, hijau = `P74` + simpul/ruas yang dilalui demo, biru = rute patroli, abu = ruas asli.
@@ -249,7 +261,7 @@ Tidak ada peran / permission check di kode.
 
 | Peran | Scope | Halaman |
 |---|---|---|
-| Pengguna tunggal (mahasiswa / presenter) | Akses penuh, tanpa login | `/`, `/analysis`, `/comparison`, `/route`, `/theory` |
+| Pengguna tunggal (mahasiswa / presenter) | Akses penuh, tanpa login | `/`, `/nodes`, `/analysis`, `/route` |
 
 Tidak ada `role`, `permission`, atau middleware otorisasi. Jangan mengasumsikan multi-user.
 

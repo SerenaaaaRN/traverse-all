@@ -12,23 +12,19 @@
     key: string;
     label: string;
     withMap: boolean;
-    panel: "compact" | "reading";
   };
 
   const pages: Page[] = [
-    { href: p("/"), key: "peta", label: "Peta", withMap: true, panel: "compact" },
-    { href: p("/nodes"), key: "subgraf", label: "Subgraf", withMap: true, panel: "compact" },
-    { href: p("/analysis"), key: "analisis", label: "Analisis", withMap: true, panel: "compact" },
-    { href: p("/route"), key: "rute", label: "Rute", withMap: true, panel: "compact" },
-    { href: p("/comparison"), key: "banding", label: "Banding", withMap: true, panel: "compact" },
-    { href: p("/theory"), key: "teori", label: "Teori", withMap: false, panel: "reading" },
+    { href: p("/"), key: "peta", label: "Peta", withMap: true },
+    { href: p("/nodes"), key: "subgraf", label: "Subgraf", withMap: true },
+    { href: p("/analysis"), key: "analisis", label: "Analisis", withMap: true },
+    { href: p("/route"), key: "rute", label: "Rute", withMap: true },
   ];
 
   const activePage = $derived(pages.find((page) => page.href === route.pathname));
   const showMap = $derived(activePage?.withMap ?? true);
   let panelOpen = $state(true);
-  const isReading = $derived((activePage?.panel ?? "compact") === "reading");
-  const panelWidth = $derived(isReading ? "w-full max-w-3xl mx-auto" : panelOpen ? "w-[420px]" : "w-10");
+  const panelWidth = $derived(panelOpen ? "w-[420px]" : "w-10");
 
   $effect(() => {
     if (!viewState.tourPlaying) return;
@@ -57,12 +53,8 @@
             <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
           {:else if item.key === "rute"}
             <circle cx="5" cy="18" r="2" /><circle cx="19" cy="6" r="2" /><path d="M7 18h5a3 3 0 003-3V8" />
-          {:else if item.key === "banding"}
-            <path d="M4 4h7v16H4zM13 4h7v16h-7z" />
           {:else if item.key === "subgraf"}
             <circle cx="5" cy="12" r="2" /><circle cx="19" cy="5" r="2" /><circle cx="19" cy="19" r="2" /><path d="M6.7 11.2L17.3 5.8M6.7 12.8l10.6 5.4" />
-          {:else}
-            <path d="M4 5a2 2 0 012-2h13v18H6a2 2 0 01-2-2zM19 3h1v18h-1" />
           {/if}
         </svg>
         <span class="text-[10px] leading-none">{item.label}</span>
@@ -93,15 +85,9 @@
   </main>
 
   <aside
-    class="shrink-0 border-l border-neutral-200 bg-white {isReading
-      ? 'overflow-y-auto'
-      : 'overflow-hidden transition-[width] duration-200 ease-out'} {panelWidth}"
+    class="shrink-0 border-l border-neutral-200 bg-white overflow-hidden transition-[width] duration-200 ease-out {panelWidth}"
   >
-    {#if isReading}
-      <div class="p-5">
-        {@render children()}
-      </div>
-    {:else if !panelOpen}
+    {#if !panelOpen}
       <button
         class="flex h-full w-full flex-col items-center gap-3 bg-white pt-4 text-neutral-400 transition hover:bg-neutral-50 hover:text-neutral-700"
         aria-label="Buka panel"
